@@ -24,7 +24,7 @@ example_app_access_token_fail_resp_invalid_client_secret = {
 
 example_app_access_token_fail_resp_missing_client_id = {
     'status': 400,
-    'message': 'missing client secret'
+    'message': 'missing client' # TODO confirm this message is accurate
 }
 
 example_app_access_token_fail_resp_missing_client_secret = {
@@ -48,14 +48,30 @@ example_token_validation_pass_resp = {
     'scopes': []
 }
 
-example_token_revoke_fail_resp_invalid_token {
+example_token_revoke_fail_resp_invalid_client_id = {
+    'status': 404,
+    'message': 'client does not exist'
+}
+
+example_token_revoke_fail_resp_invalid_token = {
     'status': 400,
     'message': 'Invalid token'
 }
 
+example_token_revoke_fail_resp_missing_client_id = {
+    'status': 400,
+    'message': 'missing client id'
+}
+
+example_token_revoke_fail_resp_missing_token = {
+    'status': 400,
+    'message': 'missing oauth token'
+}
+
+
 
 @responses.activate
-def test_get_app_access_token_bad_client_id_exception_thrown():
+def test_get_app_access_token_invalid_client_id_exception_thrown():
     responses.add(responses.POST,
                   f'{BASE_OAUTH2_URL}/token',
                   body=json.dumps(
@@ -68,7 +84,7 @@ def test_get_app_access_token_bad_client_id_exception_thrown():
 
 
 @responses.activate
-def test_get_app_access_token_bad_client_secret_exception_thrown():
+def test_get_app_access_token_invalid_client_secret_exception_thrown():
     responses.add(responses.POST,
                   f'{BASE_OAUTH2_URL}/token',
                   body=json.dumps(
@@ -81,7 +97,7 @@ def test_get_app_access_token_bad_client_secret_exception_thrown():
 
 
 @responses.activate
-def test_get_app_access_token_no_client_id():
+def test_get_app_access_token_missing_client_id_exception_thrown():
     responses.add(responses.POST,
                   f'{BASE_OAUTH2_URL}/token',
                   body=json.dumps(
@@ -94,7 +110,7 @@ def test_get_app_access_token_no_client_id():
 
 
 @responses.activate
-def test_get_app_access_token_no_client_secret():
+def test_get_app_access_token_missing_client_secret_exception_thrown():
     responses.add(responses.POST,
                   f'{BASE_OAUTH2_URL}/token',
                   body=json.dumps(
@@ -125,7 +141,6 @@ def test_validate_token_invalid_ret_false():
                   body=json.dumps(example_token_validation_fail_resp),
                   status=401,
                   content_type='application/json')
-
     is_valid = token.validate_token('a')
     assert is_valid is False
 
@@ -137,9 +152,66 @@ def test_validate_token_valid_ret_true():
                   body=json.dumps(example_token_validation_pass_resp),
                   status=200,
                   content_type='application/json')
-
     is_valid = token.validate_token(example_app_access_token)
     assert is_valid is True
 
 
-def test_revoke_token_
+@responses.activate
+def test_revoke_token_invalid_client_id_throw_exception():
+    responses.add(responses.POST,
+                  f'{BASE_OAUTH2_URL}/revoke',
+                  body=json.dumps(
+                      example_token_revoke_fail_resp_invalid_client_id
+                  ),
+                  status=404,
+                  content_type='application/json')
+    with pytest.raises(requests.HTTPError):
+        token.revoke_token('a', example_app_access_token)
+
+
+@responses.activate
+def test_revoke_token_invalid_token_throw_exception():
+    responses.add(responses.POST,
+                  f'{BASE_OAUTH2_URL}/revoke',
+                  body=json.dumps(
+                      example_token_revoke_fail_resp_invalid_token
+                  ),
+                  status=400,
+                  content_type='application/json')
+    with pytest.raises(requests.HTTPError):
+        token.revoke_token(example_client_id, 'a')
+
+
+@responses.activate
+def test_revoke_token_missing_client_id_throw_exception():
+    responses.add(responses.POST,
+                  f'{BASE_OAUTH2_URL}/revoke',
+                  body=json.dumps(
+                      example_token_revoke_fail_resp_missing_client_id
+                  ),
+                  status=400,
+                  content_type='application/json')
+    with pytest.raises(requests.HTTPError):
+        token.revoke_token(None, example_app_access_token)
+
+
+@responses.activate
+def test_revoke_token_missing_token_throw_exception():
+    responses.add(responses.POST,
+                  f'{BASE_OAUTH2_URL}/revoke',
+                  body=json.dumps(
+                      example_token_revoke_fail_resp_missing_token
+                  ),
+                  status=400,
+                  content_type='application/json')
+    with pytest.raises(requests.HTTPError):
+        token.revoke_token(example_client_id, None)
+
+
+@responses.activate
+def test_revoke_token_valid_client_id_and_token_pass():
+    responses.add(responses.POST,
+                  f'{BASE_OAUTH2_URL}/revoke',
+                  status=200)  # TODO check to see what the actual response is and check to see if I pass a valid token but already revoked
+    was_revoked = token.revoke_token(example_client_id, example_app_access_token)
+    assert was_revoked is True

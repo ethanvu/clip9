@@ -33,7 +33,7 @@ def get_app_access_token(client_id, client_secret):
 
 
 def validate_token(token):
-    """Validates a Twitch token"""
+    """Validates a Twitch token."""
     logging.info(f"Validating token {token}")
     validation_headers = {'Authorization': f'OAuth {token}'}
 
@@ -45,6 +45,22 @@ def validate_token(token):
     return is_valid
 
 
-def revoke_token(token):
-    """Revokes a Twitch token"""
-    pass
+def revoke_token(client_id, token):
+    """Revokes a Twitch token."""
+    logging.info(f"Revoking token {token}")
+    revoke_params = {
+        'client_id': client_id,
+        'token': token,
+    }
+
+    resp = requests.post(f'{BASE_OAUTH2_URL}/revoke',
+                         data=revoke_params)
+
+    if (resp.status_code >= 400):
+        resp_json = resp.json()
+        logging.error(f"Error when revoking app access token: "
+                      f"{resp_json['message']}")
+        resp.raise_for_status()
+    else:
+        logging.info(f"Token {token} was sucessfully revoked")
+        return True
