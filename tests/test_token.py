@@ -1,3 +1,5 @@
+"""Tests the token module."""
+
 import json
 
 import pytest
@@ -24,7 +26,7 @@ example_app_access_token_fail_resp_invalid_client_secret = {
 
 example_app_access_token_fail_resp_missing_client_id = {
     'status': 400,
-    'message': 'missing client' # TODO confirm this message is accurate
+    'message': 'missing client id'
 }
 
 example_app_access_token_fail_resp_missing_client_secret = {
@@ -212,6 +214,7 @@ def test_revoke_token_missing_token_throw_exception():
 def test_revoke_token_valid_client_id_and_token_pass():
     responses.add(responses.POST,
                   f'{BASE_OAUTH2_URL}/revoke',
-                  status=200)  # TODO check to see what the actual response is and check to see if I pass a valid token but already revoked
-    was_revoked = token.revoke_token(example_client_id, example_app_access_token)
+                  status=200)
+    was_revoked = token.revoke_token(example_client_id,
+                                     example_app_access_token)
     assert was_revoked is True

@@ -1,4 +1,4 @@
-"""Provides methods pertaining to Twitch tokens"""
+"""Provides methods pertaining to Twitch tokens."""
 
 import logging
 
