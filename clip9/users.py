@@ -7,12 +7,12 @@ class Users:
         self.users_list = []
 
 
-    def get(self, source, client_id, oauth2_token=None):
+    def get(self, client_id, oauth2_token=None, *args):
         """Gets a list of users.
 
-        :param source: Object that will be used to identify which users to return.
         :param client_id: Twitch developer client ID.
         :param oauth_token: Twitch developer OAuth2 token.
+        :param *args: Used to identify which users to return.
         :returns: A list of dictionaries, each representing a Twitch user.
         """
         raise NotImplementedError

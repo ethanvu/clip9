@@ -3,12 +3,14 @@
 import json
 
 import pytest
+import requests
 import responses
 
 from clip9.constants import BASE_KRAKEN_URL
 from clip9.teamusers import TeamUsers
 
 example_client_id = 'uo6dggojyb8d6soh92zknwmi5ej1q2'
+example_app_access_token = 'prau3ol6mg5glgek8m89ec2s9q5i3i'
 
 example_users_list = [{ 
     '_id': 5582097,
@@ -43,9 +45,15 @@ example_team_pass_resp = {
     'users': example_users_list
 }
 
+example_team_fail_resp_invalid_team = {
+    'error': 'Not Found',
+    'status': 404,
+    'message': 'Team does not exist'
+}
+
 
 @responses.activate
-def test_get_valid_team_gets_users():
+def test_get_valid_team_and_client_id_gets_users():
     team_name = 'staff'
     responses.add(responses.GET,
                   f'{BASE_KRAKEN_URL}/teams/{team_name}',
@@ -53,13 +61,36 @@ def test_get_valid_team_gets_users():
                   status=200,
                   content_type='application/json')
     team_users = TeamUsers()
-    team_users.get(team_name, 'uo6dggojyb8d6soh92zknwmi5ej1q2')
+    team_users.get(client_id=example_client_id, team_name)
     users_list = team_users.users_list
     assert example_users_list == users_list
 
 
-def test_get_invalid_team_():
-    pass
+@responses.activate
+def test_get_valid_team_and_oauth_token_gets_users():
+    team_name = 'staff'
+    responses.add(responses.GET,
+                  f'{BASE_KRAKEN_URL}/teams/{team_name}',
+                  body=json.dumps(example_team_pass_resp),
+                  status=200,
+                  content_type='application/json')
+    team_users = TeamUsers()
+    team_users.get(oauth_token=example_app_access_token, team_name)
+    users_list = team_users.users_list
+    assert example_users_list == users_list
+
+
+@responses.activate
+def test_get_invalid_team_throws_exception():
+    team_name = 'aaaaaa'
+    responses.add(responses.GET,
+                  f'{BASE_KRAKEN_URL}/teams/{team_name}',
+                  body=json.dumps(example_team_fail_resp_invalid_team),
+                  status=404,
+                  content_type='application/json')
+    team_users = TeamUsers()
+    with pytest.raises(requests.HTTPError):
+        team_users.get(client_id=example_client_id, team_name)
 
 
 def test_get_invalid_client_id_():
@@ -67,4 +98,8 @@ def test_get_invalid_client_id_():
 
 
 def test_get_invalid_token_():
+    pass
+
+
+def test_get_invalid_credentials_():
     pass
