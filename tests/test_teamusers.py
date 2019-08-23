@@ -51,6 +51,18 @@ example_team_fail_resp_invalid_team = {
     'message': 'Team does not exist'
 }
 
+example_team_fail_resp_invalid_client_id = {
+    'error': 'Bad Request',
+    'status': 400,
+    'message': 'Invalid client id specified'
+}
+
+example_team_fail_resp_missing_client_id = {
+    'error': 'Bad Request',
+    'status': 400,
+    'message': 'No client id specified'
+}
+
 
 @responses.activate
 def test_get_valid_team_and_client_id_gets_users():
@@ -61,7 +73,7 @@ def test_get_valid_team_and_client_id_gets_users():
                   status=200,
                   content_type='application/json')
     team_users = TeamUsers()
-    team_users.get(client_id=example_client_id, team_name)
+    team_users.get(team_name, client_id=example_client_id)
     users_list = team_users.users_list
     assert example_users_list == users_list
 
@@ -75,7 +87,23 @@ def test_get_valid_team_and_oauth_token_gets_users():
                   status=200,
                   content_type='application/json')
     team_users = TeamUsers()
-    team_users.get(oauth_token=example_app_access_token, team_name)
+    team_users.get(team_name, oauth_token=example_app_access_token)
+    users_list = team_users.users_list
+    assert example_users_list == users_list
+
+
+@responses.activate
+def test_get_valid_team_client_id_and_oauth_token_gets_users():
+    team_name = 'staff'
+    responses.add(responses.GET,
+                  f'{BASE_KRAKEN_URL}/teams/{team_name}',
+                  body=json.dumps(example_team_pass_resp),
+                  status=200,
+                  content_type='application/json')
+    team_users = TeamUsers()
+    team_users.get(team_name,
+                   client_id=example_client_id,
+                   oauth_token=example_app_access_token)
     users_list = team_users.users_list
     assert example_users_list == users_list
 
@@ -90,16 +118,72 @@ def test_get_invalid_team_throws_exception():
                   content_type='application/json')
     team_users = TeamUsers()
     with pytest.raises(requests.HTTPError):
-        team_users.get(client_id=example_client_id, team_name)
+        team_users.get(team_name, client_id=example_client_id)
 
 
-def test_get_invalid_client_id_():
+@responses.activate
+def test_get_missing_team_throws_exception():
+    # TODO
+    team_name = None
+    responses.add(responses.GET,
+                  f'{BASE_KRAKEN_URL}/teams/{team_name}',
+                  body=json.dumps(example_team_fail_resp_invalid_team),
+                  status=404,
+                  content_type='application/json')
+    team_users = TeamUsers()
+    with pytest.raises(requests.HTTPError):
+        team_users.get(team_name, client_id=example_client_id)
+
+
+@responses.activate
+def test_get_invalid_client_id_throws_exception():
+    team_name = 'staff'
+    responses.add(responses.GET,
+                  f'{BASE_KRAKEN_URL}/teams/{team_name}',
+                  body=json.dumps(example_team_fail_resp_invalid_client_id),
+                  status=400,
+                  content_type='application/json')
+    team_users = TeamUsers()
+    with pytest.raises(requests.HTTPError):
+        team_users.get(team_name, client_id=example_client_id)
+
+
+@responses.activate
+def test_get_invalid_client_id_valid_token_throws_exception():
     pass
 
 
-def test_get_invalid_token_():
+@responses.activate
+def test_get_valid_client_id_invalid_token_throws_exception():
     pass
 
 
-def test_get_invalid_credentials_():
+@responses.activate
+def test_get_invalid_token_throws_exception():
+    team_name = 'staff'
+    responses.add(responses.GET,
+                  f'{BASE_KRAKEN_URL}/teams/{team_name}',
+                  body=json.dumps(example_team_fail_resp_missing_client_id),
+                  status=400,
+                  content_type='application/json')
+    team_users = TeamUsers()
+    with pytest.raises(requests.HTTPError):
+        team_users.get(team_name, client_id=example_client_id)
+
+
+@responses.activate
+def test_get_invalid_client_id_and_token_throws_exception():
     pass
+
+
+@responses.activate
+def test_get_missing_client_id_and_token_throws_exception():
+    team_name = 'staff'
+    responses.add(responses.GET,
+                  f'{BASE_KRAKEN_URL}/teams/{team_name}',
+                  body=json.dumps(example_team_fail_resp_missing_client_id),
+                  status=400,
+                  content_type='application/json')
+    team_users = TeamUsers()
+    with pytest.raises(requests.HTTPError):
+        team_users.get(team_name)
