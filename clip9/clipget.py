@@ -4,7 +4,6 @@ import logging
 import math
 
 import requests
-from twitch import TwitchHelix
 
 from clip9.constants import BASE_TWITCHMETRICS_URL
 
@@ -13,24 +12,23 @@ class ClipGetter:
     time until now.
     """
 
-    def __init__(self, users_list, start_time=None, end_time=None, lang=None):
+    def __init__(self, users_list, started_at=None, ended_at=None, lang=None):
         """Initializes a new ClipGetter
 
         :param users_list: List of dictionaries of information of users.
-        :param start_time: Beginning of time window of clips to get.  RFC 3339
+        :param started_at: Beginning of time window of clips to get.  RFC 3339
             format.
-        :param end_time: End of time window of clips to get.  RFC 3339 format.
+        :param ended_at: End of time window of clips to get.  RFC 3339 format.
         :param lang: Language of clips to get.  Default is all languages.
         """
         self.users_list = users_list
-        self.start_time = start_time
-        self.end_time = end_time
+        self.started_at = started_at
+        self.ended_at = ended_at
         self.lang = 'en'
         self.clips_list = None
 
 
-    @staticmethod
-    def _get_avg_viewers_in_past_week(user_id, user_name):
+    def _get_avg_viewers_in_past_week(self, user_id, user_name):
         """Return the average viewers of a user in the past week."""
         logging.info(f"Getting average view count for {user_name}")
         resp = requests.get(f'{BASE_TWITCHMETRICS_URL}c/{user_id}-{user_name}'
@@ -65,41 +63,41 @@ class ClipGetter:
         return avg_views
 
 
-    @staticmethod
-    def _get_clip_rating(clip_views, avg_viewers):
+    def _get_clip_rating(self, clip_views, avg_viewers):
         """Return a rating for the given clip."""
         return clip_views / (avg_viewers/9 + 100)
 
 
-    @staticmethod
-    def _get_good_clips(user_id, user_name, client_id=None, oauth_token=None):
-        """Return a list of information of 'good' clips for a user since a
-        start time until now.
-        """
+    def _get_good_clips(self, user_id, user_name, client_id=None,
+            oauth_token=None):
+        """Return a list of information of 'good' clips for a user"""
         avg_views = self._get_avg_viewers_in_past_week(user_id, user_name)
         if (avg_views == 0):
-            logging.info(f"{user_name} didn't stream since {self.start_time}."
+            logging.info(f"{user_name} didn't stream since last week."
                          f"Skipping getting clips for {user_name}.")
             return None
 
-        logging.info(f"Getting clips for {user_name} since {self.start_time}")
-        client = TwitchHelix(client_id, oauth_token)
-        clips = client.get_clips(broadcaster_id=userid)
-        clip_headers = {'Authorization': f'Bearer {self.access_token}'}
+        logging.info(f"Getting clips for {user_name}")
+        clip_headers = {}
+        if client_id is not None:
+            clip_headers['Client-ID'] = client_id
+        if oauth_token is not None:
+            clip_headers['Authorization'] = f'Bearer {oauth_token}'
         clip_params = {
-            'broadcaster_id': streamer_id,
-            'started_at': self.start_time,
+            'broadcaster_id': user_id,
+            'started_at': self.started_at,
+            'ended_at': self.ended_at,
         }
         resp = requests.get(f'https://api.twitch.tv/helix/clips', 
                             headers=clip_headers, params=clip_params)
         resp_json = resp.json()
 
         if (resp.status_code >= 400):
-            logging.error(f"Error when getting clips of streamer "
-                          f"{streamer_name}: {resp_json['message']}")
+            logging.error(f"Error when getting clips of streamer {user_name}:"
+                          f" {resp_json['message']}")
             resp.raise_for_status()
 
-        logging.info(f"Got a list of clips of streamer {streamer_name}")
+        logging.info(f"Got a list of clips of streamer {user_name}")
         all_clips = resp_json['data']
         good_clips = []
         for clip in all_clips:
@@ -113,7 +111,7 @@ class ClipGetter:
             else:
                 break
         logging.info(f"Found {len(good_clips)} good clip(s) for "
-                     f"{streamer_name}")
+                     f"{user_name}")
         return good_clips
 
 
