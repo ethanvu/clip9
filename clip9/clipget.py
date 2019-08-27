@@ -4,6 +4,7 @@ import logging
 import math
 
 import requests
+from twitch import TwitchHelix
 
 from clip9.constants import BASE_TWITCHMETRICS_URL
 
@@ -12,7 +13,7 @@ class ClipGetter:
     time until now.
     """
 
-    def __init__(self, users_list, start_time, end_time=None, lang=None):
+    def __init__(self, users_list, start_time=None, end_time=None, lang=None):
         """Initializes a new ClipGetter
 
         :param users_list: List of dictionaries of information of users.
@@ -28,7 +29,8 @@ class ClipGetter:
         self.clips_list = None
 
 
-    def _get_avg_viewers_in_past_week(self, user_id, user_name):
+    @staticmethod
+    def _get_avg_viewers_in_past_week(user_id, user_name):
         """Return the average viewers of a user in the past week."""
         logging.info(f"Getting average view count for {user_name}")
         resp = requests.get(f'{BASE_TWITCHMETRICS_URL}c/{user_id}-{user_name}'
@@ -63,29 +65,26 @@ class ClipGetter:
         return avg_views
 
 
-    def _is_clip_good(self, clip_views, avg_stream_view):
-        """Return true if the clip is 'good' and false otherwise."""
-        return avg_stream_view/9 + 100 <= clip_views
-
-
-    def _get_clip_rating(self, clip_views, avg_stream_view):
+    @staticmethod
+    def _get_clip_rating(clip_views, avg_viewers):
         """Return a rating for the given clip."""
-        return clip_views / (avg_stream_view/9 + 100)
+        return clip_views / (avg_viewers/9 + 100)
 
 
-    def _get_good_clips(self, streamer_id, streamer_name):
-        """Return a list of information of 'good' clips for a streamer since a 
+    @staticmethod
+    def _get_good_clips(user_id, user_name, client_id=None, oauth_token=None):
+        """Return a list of information of 'good' clips for a user since a
         start time until now.
         """
-        avg_views = self._get_avg_viewers_in_past_week(streamer_id, streamer_name)
+        avg_views = self._get_avg_viewers_in_past_week(user_id, user_name)
         if (avg_views == 0):
-            logging.info(f"{streamer_name} didn't stream since "
-                         f"{self.start_time}.  Skipping getting clips for "
-                         f"{streamer_name}.")
+            logging.info(f"{user_name} didn't stream since {self.start_time}."
+                         f"Skipping getting clips for {user_name}.")
             return None
 
-        logging.info(f"Getting clips for {streamer_name} since "
-                     f"{self.start_time}")
+        logging.info(f"Getting clips for {user_name} since {self.start_time}")
+        client = TwitchHelix(client_id, oauth_token)
+        clips = client.get_clips(broadcaster_id=userid)
         clip_headers = {'Authorization': f'Bearer {self.access_token}'}
         clip_params = {
             'broadcaster_id': streamer_id,
@@ -118,11 +117,11 @@ class ClipGetter:
         return good_clips
 
 
-    def get_clips(self):
+    def get_clips(self, client_id=None, oauth_token=None):
         """Return a list of information of 'good' clips for streamers in a
         Twitch Team.
         
-        The format of the information of each clip can be referenced from
+        The format of the information of each clip can be seen here
         https://dev.twitch.tv/docs/api/reference/#get-clips
         """
         self.access_token = self._get_access_token()
