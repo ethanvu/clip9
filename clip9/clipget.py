@@ -38,7 +38,7 @@ class ClipGetter:
             logging.info(f"Couldn't find weekly viewer stats for {user_name}."
                          f"Skipping getting clips for this user.")
             return 0
-        elif (resp.status_code != 200):
+        elif (resp.status_code >= 400):
             logging.error(f"Error when getting weekly viewer stats of "
                           f"{user_name}: Got status code {resp.status_code}")
             resp.raise_for_status()
@@ -71,11 +71,12 @@ class ClipGetter:
     def _get_good_clips(self, user_id, user_name, client_id=None,
                         oauth_token=None):
         """Return a list of information of 'good' clips for a user"""
+        good_clips = []
         avg_views = self._get_avg_viewers_in_past_week(user_id, user_name)
         if (avg_views == 0):
             logging.info(f"{user_name} didn't stream since last week."
                          f"Skipping getting clips for {user_name}.")
-            return None
+            return good_clips
 
         logging.info(f"Getting clips for {user_name}")
         clip_headers = {}
@@ -99,7 +100,6 @@ class ClipGetter:
 
         logging.info(f"Got a list of clips of streamer {user_name}")
         all_clips = resp_json['data']
-        good_clips = []
         for clip in all_clips:
             logging.debug(f"Clip {clip['id']} has {clip['view_count']} views")
             clip['rating'] = self._get_clip_rating(clip['view_count'],

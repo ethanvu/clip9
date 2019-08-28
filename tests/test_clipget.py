@@ -213,6 +213,31 @@ def test__get_avg_viewers_in_past_week_user_didnt_stream_ret_0():
     assert 0 == avg
 
 
+@responses.activate
+def test__get_avg_viewers_in_past_week_user_didnt_stream_ret_0():
+    responses.add(responses.GET,
+                  f'{BASE_TWITCHMETRICS_URL}c/{example_users_list[0]["_id"]}-'
+                  f'{example_users_list[0]["name"]}/recent_viewership_values',
+                  status=404,
+                  content_type='text/html')
+    getter = ClipGetter(example_users_list)
+    avg = getter._get_avg_viewers_in_past_week(example_users_list[0]['_id'],
+                                               example_users_list[0]['name'])
+    assert 0 == avg
+    
+
+@responses.activate
+def test__get_avg_viewers_in_past_week_got_gt_400_status_code_throws_exception():
+    responses.add(responses.GET,
+                  f'{BASE_TWITCHMETRICS_URL}c/{example_users_list[0]["_id"]}-'
+                  f'{example_users_list[0]["name"]}/recent_viewership_values',
+                  status=400,
+                  content_type='text/html')
+    getter = ClipGetter(example_users_list)
+    with pytest.raises(requests.HTTPError):
+        getter._get_avg_viewers_in_past_week(example_users_list[0]['_id'],
+                                             example_users_list[0]['name'])
+
 
 def test__get_clip_rating_low_clip_views_high_avg_ret_gt_1():
     getter = ClipGetter(example_users_list)
@@ -268,6 +293,21 @@ def test__get_good_clips_valid_oauth_token_ret_clips():
                                    oauth_token=example_app_access_token)
     assert len(clips) == 1
     assert clips[0]['id'] == 'RandomClip1'
+
+
+@responses.activate
+def test__get_good_clips_didnt_stream_ret_no_clips():
+    responses.add(responses.GET,
+                  f'{BASE_TWITCHMETRICS_URL}c/{example_users_list[0]["_id"]}-'
+                  f'{example_users_list[0]["name"]}/recent_viewership_values',
+                  body=json.dumps(example_twitchmetrics_viewership_resp_empty),
+                  status=200,
+                  content_type='application/json')
+    getter = ClipGetter(example_users_list)
+    clips = getter._get_good_clips(example_users_list[0]["_id"],
+                                   example_users_list[0]["name"],
+                                   oauth_token=example_app_access_token)
+    assert len(clips) == 0
 
 
 @responses.activate
