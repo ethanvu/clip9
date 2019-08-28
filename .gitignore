@@ -1,5 +1,7 @@
 *.sw*
+__pycache__/
+.coverage
+coverage.xml
 env/
 logs/
 notes/
-__pycache__/
