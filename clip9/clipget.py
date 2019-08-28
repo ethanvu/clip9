@@ -24,7 +24,7 @@ class ClipGetter:
         self.users_list = users_list
         self.started_at = started_at
         self.ended_at = ended_at
-        self.lang = 'en'
+        self.lang = lang
         self.clips_list = None
 
 
@@ -116,14 +116,13 @@ class ClipGetter:
 
 
     def get_clips(self, client_id=None, oauth_token=None):
-        """Return a list of information of 'good' clips for streamers in a
-        Twitch Team.
+        """Return a list of information of 'good' clips from a list of users.
         
-        The format of the information of each clip can be seen here
+        The format of the information of each clip can be found here:
         https://dev.twitch.tv/docs/api/reference/#get-clips
         """
         total_clips = []
-        for user in users_list:
+        for user in self.users_list:
             if (self.lang is None
                     or user['broadcaster_language'] == self.lang):
                 clips = self._get_good_clips(user['_id'], user['name'],

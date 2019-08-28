@@ -33,6 +33,26 @@ example_users_list = [{
     'url': 'https://www.twitch.tv/sarbandia',
     'video_banner': None,
     'views': 8168
+},
+{
+    '_id': 5582098,
+    'broadcaster_language': 'es',
+    'created_at': '2009-04-13T21:22:28Z',
+    'display_name': 'Sarbandia2',
+    'followers': 1182,
+    'game': 'Hearthstone: Heroes of Warcraft',
+    'language': 'en',
+    'logo': 'https://static-cdn.jtvnw.net/jtv_user_pictures/sarbandia-profile_image-6693b5952f31c847-300x300.jpeg',
+    'mature': False,
+    'name': 'sarbandia2',
+    'partner': False,
+    'profile_banner': 'https://static-cdn.jtvnw.net/jtv_user_pictures/sarbandia-profile_banner-247cdbe62dbcf4d9-480.jpeg',
+    'profile_banner_background_color': None,
+    'status': 'Midrange shaman laddering',
+    'updated_at': '2016-12-15T19:02:40Z',
+    'url': 'https://www.twitch.tv/sarbandia2',
+    'video_banner': None,
+    'views': 8168
 }]
 
 example_user_list_empty = []
@@ -102,6 +122,30 @@ example_clips_resp = {
             'view_count': 150,
             'created_at': '2019-8-20T22:35:18Z',
             'thumbnail_url': 'https://clips-media-assets.twitch.tv/157589950-preview-480x272.jpg'
+        },
+    ],
+    'pagination': {
+        'cursor': 'eyJiIjpudWxsLCJhIjoiIn0'
+    }
+}
+
+example_clips_resp2 = {
+    'data': [
+        {
+            'id': 'RandomClip3',
+            'url': 'https://clips.twitch.tv/AwkwardHelplessSalamanderSwiftRage',
+            'embed_url': 'https://clips.twitch.tv/embed?clip=RandomClip1',
+            'broadcaster_id': '5582098',
+            'broadcaster_name': 'Sabradina2',
+            'creator_id': '123456',
+            'creator_name': 'MrMarshall',
+            'video_id': '1234567',
+            'game_id': '33103',
+            'language': 'es',
+            'title': 'random2',
+            'view_count': 250,
+            'created_at': '2019-08-19T22:34:18Z',
+            'thumbnail_url': 'https://clips-media-assets.twitch.tv/157589949-preview-480x272.jpg'
         },
     ],
     'pagination': {
@@ -411,6 +455,105 @@ def test__get_good_clips_invalid_ended_at_throw_exception():
 
 
 @responses.activate
-def test_get_clips_all_lang_ret_clips():
+def test_get_clips_all_lang_valid_client_id_ret_clips():
+    responses.add(responses.GET,
+                  f'{BASE_TWITCHMETRICS_URL}c/{example_users_list[0]["_id"]}-'
+                  f'{example_users_list[0]["name"]}/recent_viewership_values',
+                  body=json.dumps(example_twitchmetrics_viewership_resp),
+                  status=200,
+                  content_type='application/json')
+    responses.add(responses.GET,
+                  f'{BASE_HELIX_URL}clips?'
+                  f'broadcaster_id={example_users_list[0]["_id"]}',
+                  body=json.dumps(example_clips_resp),
+                  status=200,
+                  content_type='application/json')
+    responses.add(responses.GET,
+                  f'{BASE_TWITCHMETRICS_URL}c/{example_users_list[1]["_id"]}-'
+                  f'{example_users_list[1]["name"]}/recent_viewership_values',
+                  body=json.dumps(example_twitchmetrics_viewership_resp),
+                  status=200,
+                  content_type='application/json')
+    responses.add(responses.GET,
+                  f'{BASE_HELIX_URL}clips?'
+                  f'broadcaster_id={example_users_list[1]["_id"]}',
+                  body=json.dumps(example_clips_resp2),
+                  status=200,
+                  content_type='application/json')
     getter = ClipGetter(example_users_list)
-    pass
+    clips = getter.get_clips(client_id=example_client_id)
+    assert len(clips) == 2
+    assert clips[0]['id'] == 'RandomClip1'
+    assert clips[1]['id'] == 'RandomClip3'
+
+
+@responses.activate
+def test_get_clips_all_lang_valid_token_ret_clips():
+    responses.add(responses.GET,
+                  f'{BASE_TWITCHMETRICS_URL}c/{example_users_list[0]["_id"]}-'
+                  f'{example_users_list[0]["name"]}/recent_viewership_values',
+                  body=json.dumps(example_twitchmetrics_viewership_resp),
+                  status=200,
+                  content_type='application/json')
+    responses.add(responses.GET,
+                  f'{BASE_HELIX_URL}clips?'
+                  f'broadcaster_id={example_users_list[0]["_id"]}',
+                  body=json.dumps(example_clips_resp),
+                  status=200,
+                  content_type='application/json')
+    responses.add(responses.GET,
+                  f'{BASE_TWITCHMETRICS_URL}c/{example_users_list[1]["_id"]}-'
+                  f'{example_users_list[1]["name"]}/recent_viewership_values',
+                  body=json.dumps(example_twitchmetrics_viewership_resp),
+                  status=200,
+                  content_type='application/json')
+    responses.add(responses.GET,
+                  f'{BASE_HELIX_URL}clips?'
+                  f'broadcaster_id={example_users_list[1]["_id"]}',
+                  body=json.dumps(example_clips_resp2),
+                  status=200,
+                  content_type='application/json')
+    getter = ClipGetter(example_users_list)
+    clips = getter.get_clips(oauth_token=example_app_access_token)
+    assert len(clips) == 2
+    assert clips[0]['id'] == 'RandomClip1'
+    assert clips[1]['id'] == 'RandomClip3'
+
+
+@responses.activate
+def test_get_clips_invalid_client_id_and_token_throws_exception():
+    responses.add(responses.GET,
+                  f'{BASE_TWITCHMETRICS_URL}c/{example_users_list[0]["_id"]}-'
+                  f'{example_users_list[0]["name"]}/recent_viewership_values',
+                  body=json.dumps(example_twitchmetrics_viewership_resp),
+                  status=200,
+                  content_type='application/json')
+    responses.add(responses.GET,
+                  f'{BASE_HELIX_URL}clips?'
+                  f'broadcaster_id={example_users_list[0]["_id"]}',
+                  body=json.dumps(example_clips_resp_invalid_client_id_and_token),
+                  status=401,
+                  content_type='application/json')
+    getter = ClipGetter(example_users_list)
+    with pytest.raises(requests.HTTPError):
+        clips = getter.get_clips()
+
+
+@responses.activate
+def test_get_clips_lang_en_ret_less_clips():
+    responses.add(responses.GET,
+                  f'{BASE_TWITCHMETRICS_URL}c/{example_users_list[0]["_id"]}-'
+                  f'{example_users_list[0]["name"]}/recent_viewership_values',
+                  body=json.dumps(example_twitchmetrics_viewership_resp),
+                  status=200,
+                  content_type='application/json')
+    responses.add(responses.GET,
+                  f'{BASE_HELIX_URL}clips?'
+                  f'broadcaster_id={example_users_list[0]["_id"]}',
+                  body=json.dumps(example_clips_resp),
+                  status=200,
+                  content_type='application/json')
+    getter = ClipGetter(example_users_list, lang='en')
+    clips = getter.get_clips(oauth_token=example_app_access_token)
+    assert len(clips) == 1
+    assert clips[0]['id'] == 'RandomClip1'
