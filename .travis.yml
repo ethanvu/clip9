@@ -6,3 +6,5 @@ install:
     - pip install -r requirements.txt
 script:
     - pytest --cov-report=xml --cov=clip9 tests/
+after_success:
+    - codecov
