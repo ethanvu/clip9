@@ -69,7 +69,7 @@ class ClipGetter:
 
 
     def _get_good_clips(self, user_id, user_name, client_id=None,
-            oauth_token=None):
+                        oauth_token=None):
         """Return a list of information of 'good' clips for a user"""
         avg_views = self._get_avg_viewers_in_past_week(user_id, user_name)
         if (avg_views == 0):
@@ -122,14 +122,13 @@ class ClipGetter:
         The format of the information of each clip can be seen here
         https://dev.twitch.tv/docs/api/reference/#get-clips
         """
-        self.access_token = self._get_access_token()
-        team_members = self._get_team_members()
-        team_clips = []
-        for team_member in team_members:
-            if (team_member['broadcaster_language'] == 'en'):
-                clips = self._get_good_clips(team_member['_id'],
-                                             team_member['name'])
+        total_clips = []
+        for user in users_list:
+            if (self.lang is None
+                    or user['broadcaster_language'] == self.lang):
+                clips = self._get_good_clips(user['_id'], user['name'],
+                                             client_id, oauth_token)
                 logging.info(clips)
                 if clips:
-                    team_clips.extend(clips)
-        return team_clips
+                    total_clips.extend(clips)
+        return total_clips

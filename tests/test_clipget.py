@@ -35,6 +35,8 @@ example_users_list = [{
     'views': 8168
 }]
 
+example_user_list_empty = []
+
 example_twitchmetrics_viewership_resp = [
     ['2019-08-19T00:20:01.000Z', 950, 'Counter-Strike: Global Offensive'],
     ['2019-08-19T00:30:01.000Z', 1000, 'Counter-Strike: Global Offensive'],
@@ -82,7 +84,7 @@ example_clips_resp = {
             'language': 'en',
             'title': 'random1',
             'view_count': 250,
-            'created_at': '2017-11-30T22:34:18Z',
+            'created_at': '2019-08-19T22:34:18Z',
             'thumbnail_url': 'https://clips-media-assets.twitch.tv/157589949-preview-480x272.jpg'
         },
         {
@@ -98,13 +100,30 @@ example_clips_resp = {
             'language': 'en',
             'title': 'random1',
             'view_count': 150,
-            'created_at': '2017-11-30T22:35:18Z',
+            'created_at': '2019-8-20T22:35:18Z',
             'thumbnail_url': 'https://clips-media-assets.twitch.tv/157589950-preview-480x272.jpg'
         },
     ],
     'pagination': {
         'cursor': 'eyJiIjpudWxsLCJhIjoiIn0'
     }
+}
+
+example_clips_resp_no_clips = {
+    'data': [],
+    'pagination': {}
+}
+
+example_clips_resp_invalid_client_id_and_token = {
+    'error': 'Unauthorized',
+    'status': 401,
+    'message': 'Must provide a valid Client-ID or OAuth token'
+}
+
+example_clips_resp_invalid_started_or_ended_at = {
+    'error': 'Bad Request',
+    'status': 400,
+    'message': 'parsing time "a" as "2006-01-02T15:04:05Z07:00": cannot parse "a" as "2006"'
 }
 
 
@@ -208,8 +227,44 @@ def test__get_good_clips_valid_oauth_token_ret_clips():
 
 
 @responses.activate
+def test__get_good_clips_no_clips_ret_no_clips():
+    responses.add(responses.GET,
+                  f'{BASE_TWITCHMETRICS_URL}c/{example_users_list[0]["_id"]}-'
+                  f'{example_users_list[0]["name"]}/recent_viewership_values',
+                  body=json.dumps(example_twitchmetrics_viewership_resp),
+                  status=200,
+                  content_type='application/json')
+    responses.add(responses.GET,
+                  f'{BASE_HELIX_URL}clips?'
+                  f'broadcaster_id={example_users_list[0]["_id"]}',
+                  body=json.dumps(example_clips_resp_no_clips),
+                  status=200,
+                  content_type='application/json')
+    getter = ClipGetter(example_users_list)
+    clips = getter._get_good_clips(example_users_list[0]["_id"],
+                                   example_users_list[0]["name"],
+                                   oauth_token=example_app_access_token)
+    assert len(clips) == 0
+
+
+@responses.activate
 def test__get_good_clips_invalid_client_id_and_token_throw_exception():
-    pass
+    responses.add(responses.GET,
+                  f'{BASE_TWITCHMETRICS_URL}c/{example_users_list[0]["_id"]}-'
+                  f'{example_users_list[0]["name"]}/recent_viewership_values',
+                  body=json.dumps(example_twitchmetrics_viewership_resp),
+                  status=200,
+                  content_type='application/json')
+    responses.add(responses.GET,
+                  f'{BASE_HELIX_URL}clips?'
+                  f'broadcaster_id={example_users_list[0]["_id"]}',
+                  body=json.dumps(example_clips_resp_invalid_client_id_and_token),
+                  status=401,
+                  content_type='application/json')
+    getter = ClipGetter(example_users_list)
+    with pytest.raises(requests.HTTPError):
+        clips = getter._get_good_clips(example_users_list[0]["_id"],
+                                       example_users_list[0]["name"])
 
 
 @responses.activate
@@ -235,20 +290,127 @@ def test__get_good_clips_valid_started_at_ret_clips():
 
 
 @responses.activate
-def test__get_good_clips_only_ended_at_throw_exception():
-    pass
+def test__get_good_clips_valid_started_at_ret_clips():
+    started_at = '2019-08-19T00:00:00Z'
+    responses.add(responses.GET,
+                  f'{BASE_TWITCHMETRICS_URL}c/{example_users_list[0]["_id"]}-'
+                  f'{example_users_list[0]["name"]}/recent_viewership_values',
+                  body=json.dumps(example_twitchmetrics_viewership_resp),
+                  status=200,
+                  content_type='application/json')
+    responses.add(responses.GET,
+                  f'{BASE_HELIX_URL}clips?'
+                  f'broadcaster_id={example_users_list[0]["_id"]}'
+                  f'&started_at={started_at}',
+                  body=json.dumps(example_clips_resp),
+                  status=200,
+                  content_type='application/json')
+    getter = ClipGetter(example_users_list, started_at=started_at)
+    clips = getter._get_good_clips(example_users_list[0]["_id"],
+                                   example_users_list[0]["name"],
+                                   oauth_token=example_app_access_token)
+    assert len(clips) == 1
+    assert clips[0]['id'] == 'RandomClip1'
+
+
+@responses.activate
+def test__get_good_clips_valid_ended_at_ret_clips():
+    ended_at = '2019-08-18T00:00:00Z'
+    responses.add(responses.GET,
+                  f'{BASE_TWITCHMETRICS_URL}c/{example_users_list[0]["_id"]}-'
+                  f'{example_users_list[0]["name"]}/recent_viewership_values',
+                  body=json.dumps(example_twitchmetrics_viewership_resp),
+                  status=200,
+                  content_type='application/json')
+    responses.add(responses.GET,
+                  f'{BASE_HELIX_URL}clips?'
+                  f'broadcaster_id={example_users_list[0]["_id"]}'
+                  f'&ended_at={ended_at}',
+                  body=json.dumps(example_clips_resp),
+                  status=200,
+                  content_type='application/json')
+    getter = ClipGetter(example_users_list, ended_at=ended_at)
+    clips = getter._get_good_clips(example_users_list[0]["_id"],
+                                   example_users_list[0]["name"],
+                                   oauth_token=example_app_access_token)
+    assert len(clips) == 1
+    assert clips[0]['id'] == 'RandomClip1'
 
 
 @responses.activate
 def test__get_good_clips_valid_started_and_ended_at_ret_clips():
-    pass
+    started_at = '2019-08-19T00:00:00Z'
+    ended_at = '2019-08-21T00:00:00Z'
+    responses.add(responses.GET,
+                  f'{BASE_TWITCHMETRICS_URL}c/{example_users_list[0]["_id"]}-'
+                  f'{example_users_list[0]["name"]}/recent_viewership_values',
+                  body=json.dumps(example_twitchmetrics_viewership_resp),
+                  status=200,
+                  content_type='application/json')
+    responses.add(responses.GET,
+                  f'{BASE_HELIX_URL}clips?'
+                  f'broadcaster_id={example_users_list[0]["_id"]}'
+                  f'&started_at={started_at}'
+                  f'&ended_at={ended_at}',
+                  body=json.dumps(example_clips_resp),
+                  status=200,
+                  content_type='application/json')
+    getter = ClipGetter(example_users_list, started_at=started_at,
+                        ended_at=ended_at)
+    clips = getter._get_good_clips(example_users_list[0]["_id"],
+                                   example_users_list[0]["name"],
+                                   oauth_token=example_app_access_token)
+    assert len(clips) == 1
+    assert clips[0]['id'] == 'RandomClip1'
 
 
 @responses.activate
-def test__get_good_clips_no_clips_ret_no_clips():
+def test__get_good_clips_invalid_started_at_throw_exception():
+    started_at = 'a'
+    responses.add(responses.GET,
+                  f'{BASE_TWITCHMETRICS_URL}c/{example_users_list[0]["_id"]}-'
+                  f'{example_users_list[0]["name"]}/recent_viewership_values',
+                  body=json.dumps(example_twitchmetrics_viewership_resp),
+                  status=200,
+                  content_type='application/json')
+    responses.add(responses.GET,
+                  f'{BASE_HELIX_URL}clips?'
+                  f'broadcaster_id={example_users_list[0]["_id"]}'
+                  f'&started_at={started_at}',
+                  body=json.dumps(example_clips_resp_invalid_started_or_ended_at),
+                  status=400,
+                  content_type='application/json')
+    getter = ClipGetter(example_users_list, started_at=started_at)
+    with pytest.raises(requests.HTTPError):
+        clips = getter._get_good_clips(example_users_list[0]["_id"],
+                                       example_users_list[0]["name"],
+                                       oauth_token=example_app_access_token)
+
+
+@responses.activate
+def test__get_good_clips_invalid_ended_at_throw_exception():
+    ended_at = 'a'
+    responses.add(responses.GET,
+                  f'{BASE_TWITCHMETRICS_URL}c/{example_users_list[0]["_id"]}-'
+                  f'{example_users_list[0]["name"]}/recent_viewership_values',
+                  body=json.dumps(example_twitchmetrics_viewership_resp),
+                  status=200,
+                  content_type='application/json')
+    responses.add(responses.GET,
+                  f'{BASE_HELIX_URL}clips?'
+                  f'broadcaster_id={example_users_list[0]["_id"]}'
+                  f'&ended_at={ended_at}',
+                  body=json.dumps(example_clips_resp_invalid_started_or_ended_at),
+                  status=400,
+                  content_type='application/json')
+    getter = ClipGetter(example_users_list, ended_at=ended_at)
+    with pytest.raises(requests.HTTPError):
+        clips = getter._get_good_clips(example_users_list[0]["_id"],
+                                       example_users_list[0]["name"],
+                                       oauth_token=example_app_access_token)
+
+
+@responses.activate
+def test_get_clips_all_lang_ret_clips():
+    getter = ClipGetter(example_users_list)
     pass
-
-
-def temp():
-    getter = ClipGetter(example_users_list, 'staff', '2019-08-19T00:00:00Z',
-                        '2019-08-20T00:00:00Z')
