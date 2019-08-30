@@ -121,13 +121,14 @@ class ClipGetter:
         The format of the information of each clip can be found here:
         https://dev.twitch.tv/docs/api/reference/#get-clips
         """
+        logging.info("Getting clips")
         total_clips = []
         for user in self.users_list:
             if (self.lang is None
                     or user['broadcaster_language'] == self.lang):
                 clips = self._get_good_clips(user['_id'], user['name'],
                                              client_id, oauth_token)
-                logging.info(clips)
                 if clips:
                     total_clips.extend(clips)
+        logging.info(f"Got {len(total_clips)} clips")
         return total_clips
