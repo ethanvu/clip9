@@ -1,9 +1,9 @@
 """Module for ClipSplicer class."""
 
 import logging
-import re
 
 import requests
+from requests_html import HTMLSession
 
 class ClipSplicer():
     """Downloads and splices Twitch clips into a video."""
@@ -12,18 +12,25 @@ class ClipSplicer():
         self.clips_list = clips_list
 
 
-    def _get_clip_src_url(self, thumbnail_url):
-        """Gets the source url of a clip given its thumbnail url."""
-        logging.info(f"Getting clip source URL from {thumbnail_url}")
-        if (re.match('https://clips-media-assets.twitch.tv/'
-                     '[0-9][0-9][0-9][0-9]+-preview-480x272.jpg',
-                     thumbnail_url) is None):
-            raise ValueError(f"{thumbnail_url} is an invalid clip thumbnail "
-                             f"URL to parse")
-        nums = re.findall('[0-9][0-9][0-9][0-9]+', thumbnail_url)
-        logging.info(f"Found nums {nums[0]}")
-        return (f'https://clips-media-assets2.twitch.tv/AT-{nums[0]}'
-                 '-640x360.mp4')
+    def _get_clip_src_url(self, embed_url):
+        """Gets the source url of a clip given its embed url."""
+        logging.info(f"Getting clip source URL from {embed_url}")
+        session = HTMLSession()
+        resp = session.get(embed_url)
+
+        if (resp.status_code >= 400):
+            resp.raise_for_status()
+
+        resp.html.render(sleep=1)
+        elem = resp.html.xpath('/html/body/div[1]/div[1]/video', first=True)
+
+        if (elem is None):
+            raise ValueError("Couldn't find the proper video tag.")
+        elif ('src' not in elem.attrs):
+            raise ValueError("Couldn't src attribute.  May need to rerender.")
+
+        logging.info(f"Found video elem.  Attributes: {elem.attrs}")
+        return elem.attrs['src']
 
 
     def _download_clip(self, clip, path):
@@ -33,12 +40,14 @@ class ClipSplicer():
         :param path: Path to save the clip in.
         """
         logging.info(f"Downloading clip {clip['id']}")
-        clip_src_url = self._get_clip_src_url(clip['thumbnail_url'])
+        clip_src_url = self._get_clip_src_url(clip['embed_url'])
         logging.info(f"Clip source URL: {clip_src_url}")
         resp = requests.get(clip_src_url, stream=True)
+
         if (resp.status_code >= 400):
             logging.error(f"Error when downloading clip {resp.status_code}")
             resp.raise_for_status()
+
         with open(f'{path}/{clip["id"]}.mp4', 'wb') as f:
             for chunk in resp.iter_content(chunk_size=1024*1024):
                 if chunk:
@@ -46,6 +55,6 @@ class ClipSplicer():
         logging.info(f"Downloaded {clip['id']}.mp4")
 
 
-    def splice(self, path='./'):
+    def splice(self, result_base_name, clips_path='./', result_path='./'):
         """Splices the clips in clips_list into one video."""
         pass
