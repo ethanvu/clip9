@@ -57,4 +57,6 @@ class ClipSplicer():
 
     def splice(self, result_base_name, clips_path='./', result_path='./'):
         """Splices the clips in clips_list into one video."""
+        for clip in self.clips_list:
+            self._download_clip(clip, clips_path)
         pass

@@ -198,9 +198,29 @@ def test__download_clip_invalid_url_throws_exception(mocker):
         splicer._download_clip(example_clip_list[0], path)
 
 
+@responses.activate
+def test__download_clip_invalid_path_throws_exception(mocker):
+    src_url = 'https://clips-media-assets2.twitch.tv/AT-157589949-640x360.mp4'
+    path = '/badpath/'
+    mocker.patch('clip9.clipsplice.ClipSplicer._get_clip_src_url',
+                 return_value=src_url)
+    responses.add(responses.GET,
+                  src_url,
+                  body='a',
+                  status=200,
+                  content_type='application/xml')
+
+    splicer = ClipSplicer(example_clip_list)
+    with pytest.raises(FileNotFoundError):
+        splicer._download_clip(example_clip_list[0], path)
+
+
 @pytest.mark.skip
 @responses.activate
 def test_splice_valid_clips_success():
+    clips_path = './'
+    result_path = './'
+    result_base_name = 'result'
     responses.add(responses.GET,
                   'https://clips-media-assets2.twitch.tv/'
                   'AT-157589949-640x360.mp4',
@@ -210,12 +230,10 @@ def test_splice_valid_clips_success():
     responses.add(responses.GET,
                   'https://clips-media-assets2.twitch.tv/'
                   'AT-25242479696-640x360.mp4',
-                  body='a',
+                  body='b',
                   status=200,
                   content_type='binary/octet-stream')
-    clips_path = './'
-    result_path = './'
-    result_base_name = 'result'
+
     splicer = ClipSplicer(example_clip_list)
     splicer.splice(result_base_name)
     clip0_file = Path(f'{clips_path}{example_clip_list[0]["id"]}.mp4')
