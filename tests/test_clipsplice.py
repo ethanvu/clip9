@@ -217,19 +217,22 @@ def test__download_clip_invalid_path_throws_exception(mocker):
 
 @pytest.mark.skip
 @responses.activate
-def test_splice_valid_clips_success():
-    clips_path = './'
-    result_path = './'
+def test_splice_valid_clips_success(mocker):
+    src_url = 'https://clips-media-assets2.twitch.tv/AT-157589949-640x360.mp4'
+    src_url2 = ('https://clips-media-assets2.twitch.tv/'
+                'AT-25242479696-640x360.mp4')
     result_base_name = 'result'
+    mocker.patch('clip9.clipsplice.ClipSplicer._get_clip_src_url',
+                 return_value=src_url)
     responses.add(responses.GET,
-                  'https://clips-media-assets2.twitch.tv/'
-                  'AT-157589949-640x360.mp4',
+                  src_url,
                   body='a',
                   status=200,
                   content_type='binary/octet-stream')
+    mocker.patch('clip9.clipsplice.ClipSplicer._get_clip_src_url',
+                 return_value=src_url2)
     responses.add(responses.GET,
-                  'https://clips-media-assets2.twitch.tv/'
-                  'AT-25242479696-640x360.mp4',
+                  src_url2,
                   body='b',
                   status=200,
                   content_type='binary/octet-stream')
