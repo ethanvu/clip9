@@ -179,6 +179,7 @@ def test__get_avg_viewers_in_past_week_user_exists_ret_avg():
                   body=json.dumps(example_twitchmetrics_viewership_resp),
                   status=200,
                   content_type='application/json')
+
     getter = ClipGetter(example_users_list)
     avg = getter._get_avg_viewers_in_past_week(example_users_list[0]['_id'],
                                                example_users_list[0]['name'])
@@ -193,6 +194,7 @@ def test__get_avg_viewers_in_past_week_user_doesnt_exist_ret_0():
                   body=example_twitchmetrics_viewership_resp_doesnt_exist,
                   status=404,
                   content_type='text/html')
+
     getter = ClipGetter(example_users_list)
     avg = getter._get_avg_viewers_in_past_week(example_users_list[0]['_id'],
                                                example_users_list[0]['name'])
@@ -207,6 +209,7 @@ def test__get_avg_viewers_in_past_week_user_didnt_stream_ret_0():
                   body=json.dumps(example_twitchmetrics_viewership_resp_empty),
                   status=200,
                   content_type='application/json')
+
     getter = ClipGetter(example_users_list)
     avg = getter._get_avg_viewers_in_past_week(example_users_list[0]['_id'],
                                                example_users_list[0]['name'])
@@ -220,6 +223,7 @@ def test__get_avg_viewers_in_past_week_user_didnt_stream_ret_0():
                   f'{example_users_list[0]["name"]}/recent_viewership_values',
                   status=404,
                   content_type='text/html')
+
     getter = ClipGetter(example_users_list)
     avg = getter._get_avg_viewers_in_past_week(example_users_list[0]['_id'],
                                                example_users_list[0]['name'])
@@ -233,6 +237,7 @@ def test__get_avg_viewers_in_past_week_got_gt_400_status_code_throws_exception()
                   f'{example_users_list[0]["name"]}/recent_viewership_values',
                   status=400,
                   content_type='text/html')
+
     getter = ClipGetter(example_users_list)
     with pytest.raises(requests.HTTPError):
         getter._get_avg_viewers_in_past_week(example_users_list[0]['_id'],
@@ -265,6 +270,7 @@ def test__get_good_clips_valid_client_id_ret_clips():
                   body=json.dumps(example_clips_resp),
                   status=200,
                   content_type='application/json')
+
     getter = ClipGetter(example_users_list)
     clips = getter._get_good_clips(example_users_list[0]["_id"],
                                    example_users_list[0]["name"],
@@ -287,6 +293,7 @@ def test__get_good_clips_valid_oauth_token_ret_clips():
                   body=json.dumps(example_clips_resp),
                   status=200,
                   content_type='application/json')
+
     getter = ClipGetter(example_users_list)
     clips = getter._get_good_clips(example_users_list[0]["_id"],
                                    example_users_list[0]["name"],
@@ -303,6 +310,7 @@ def test__get_good_clips_didnt_stream_ret_no_clips():
                   body=json.dumps(example_twitchmetrics_viewership_resp_empty),
                   status=200,
                   content_type='application/json')
+
     getter = ClipGetter(example_users_list)
     clips = getter._get_good_clips(example_users_list[0]["_id"],
                                    example_users_list[0]["name"],
@@ -324,6 +332,7 @@ def test__get_good_clips_no_clips_ret_no_clips():
                   body=json.dumps(example_clips_resp_no_clips),
                   status=200,
                   content_type='application/json')
+
     getter = ClipGetter(example_users_list)
     clips = getter._get_good_clips(example_users_list[0]["_id"],
                                    example_users_list[0]["name"],
@@ -345,6 +354,7 @@ def test__get_good_clips_invalid_client_id_and_token_throw_exception():
                   body=json.dumps(example_clips_resp_invalid_client_id_and_token),
                   status=401,
                   content_type='application/json')
+
     getter = ClipGetter(example_users_list)
     with pytest.raises(requests.HTTPError):
         clips = getter._get_good_clips(example_users_list[0]["_id"],
@@ -365,6 +375,7 @@ def test__get_good_clips_valid_started_at_ret_clips():
                   body=json.dumps(example_clips_resp),
                   status=200,
                   content_type='application/json')
+
     getter = ClipGetter(example_users_list)
     clips = getter._get_good_clips(example_users_list[0]["_id"],
                                    example_users_list[0]["name"],
@@ -389,6 +400,7 @@ def test__get_good_clips_valid_started_at_ret_clips():
                   body=json.dumps(example_clips_resp),
                   status=200,
                   content_type='application/json')
+
     getter = ClipGetter(example_users_list, started_at=started_at)
     clips = getter._get_good_clips(example_users_list[0]["_id"],
                                    example_users_list[0]["name"],
@@ -413,6 +425,7 @@ def test__get_good_clips_valid_ended_at_ret_clips():
                   body=json.dumps(example_clips_resp),
                   status=200,
                   content_type='application/json')
+
     getter = ClipGetter(example_users_list, ended_at=ended_at)
     clips = getter._get_good_clips(example_users_list[0]["_id"],
                                    example_users_list[0]["name"],
@@ -439,6 +452,7 @@ def test__get_good_clips_valid_started_and_ended_at_ret_clips():
                   body=json.dumps(example_clips_resp),
                   status=200,
                   content_type='application/json')
+
     getter = ClipGetter(example_users_list, started_at=started_at,
                         ended_at=ended_at)
     clips = getter._get_good_clips(example_users_list[0]["_id"],
@@ -461,9 +475,12 @@ def test__get_good_clips_invalid_started_at_throw_exception():
                   f'{BASE_HELIX_URL}clips?'
                   f'broadcaster_id={example_users_list[0]["_id"]}'
                   f'&started_at={started_at}',
-                  body=json.dumps(example_clips_resp_invalid_started_or_ended_at),
+                  body=json.dumps(
+                      example_clips_resp_invalid_started_or_ended_at
+                  ),
                   status=400,
                   content_type='application/json')
+
     getter = ClipGetter(example_users_list, started_at=started_at)
     with pytest.raises(requests.HTTPError):
         clips = getter._get_good_clips(example_users_list[0]["_id"],
@@ -484,9 +501,12 @@ def test__get_good_clips_invalid_ended_at_throw_exception():
                   f'{BASE_HELIX_URL}clips?'
                   f'broadcaster_id={example_users_list[0]["_id"]}'
                   f'&ended_at={ended_at}',
-                  body=json.dumps(example_clips_resp_invalid_started_or_ended_at),
+                  body=json.dumps(
+                      example_clips_resp_invalid_started_or_ended_at
+                  ),
                   status=400,
                   content_type='application/json')
+
     getter = ClipGetter(example_users_list, ended_at=ended_at)
     with pytest.raises(requests.HTTPError):
         clips = getter._get_good_clips(example_users_list[0]["_id"],
@@ -520,6 +540,7 @@ def test_get_clips_all_lang_valid_client_id_ret_clips():
                   body=json.dumps(example_clips_resp2),
                   status=200,
                   content_type='application/json')
+
     getter = ClipGetter(example_users_list)
     clips = getter.get_clips(client_id=example_client_id)
     assert len(clips) == 2
@@ -553,6 +574,7 @@ def test_get_clips_all_lang_valid_token_ret_clips():
                   body=json.dumps(example_clips_resp2),
                   status=200,
                   content_type='application/json')
+
     getter = ClipGetter(example_users_list)
     clips = getter.get_clips(oauth_token=example_app_access_token)
     assert len(clips) == 2
@@ -571,9 +593,12 @@ def test_get_clips_invalid_client_id_and_token_throws_exception():
     responses.add(responses.GET,
                   f'{BASE_HELIX_URL}clips?'
                   f'broadcaster_id={example_users_list[0]["_id"]}',
-                  body=json.dumps(example_clips_resp_invalid_client_id_and_token),
+                  body=json.dumps(
+                      example_clips_resp_invalid_client_id_and_token
+                  ),
                   status=401,
                   content_type='application/json')
+
     getter = ClipGetter(example_users_list)
     with pytest.raises(requests.HTTPError):
         clips = getter.get_clips()
@@ -593,6 +618,7 @@ def test_get_clips_lang_en_ret_less_clips():
                   body=json.dumps(example_clips_resp),
                   status=200,
                   content_type='application/json')
+
     getter = ClipGetter(example_users_list, lang='en')
     clips = getter.get_clips(oauth_token=example_app_access_token)
     assert len(clips) == 1

@@ -77,6 +77,7 @@ def test_get_valid_team_and_client_id_gets_users():
                   body=json.dumps(example_team_pass_resp),
                   status=200,
                   content_type='application/json')
+
     team_users = TeamUsers()
     team_users.get(team_name, client_id=example_client_id)
     users_list = team_users.users_list
@@ -91,6 +92,7 @@ def test_get_valid_team_and_oauth_token_gets_users():
                   body=json.dumps(example_team_pass_resp),
                   status=200,
                   content_type='application/json')
+
     team_users = TeamUsers()
     team_users.get(team_name, oauth_token=example_app_access_token)
     users_list = team_users.users_list
@@ -105,6 +107,7 @@ def test_get_valid_team_client_id_and_oauth_token_gets_users():
                   body=json.dumps(example_team_pass_resp),
                   status=200,
                   content_type='application/json')
+
     team_users = TeamUsers()
     team_users.get(team_name,
                    client_id=example_client_id,
@@ -121,6 +124,7 @@ def test_get_invalid_team_throws_exception():
                   body=json.dumps(example_team_fail_resp_invalid_team),
                   status=404,
                   content_type='application/json')
+
     team_users = TeamUsers()
     with pytest.raises(requests.HTTPError):
         team_users.get(team_name, client_id=example_client_id)
@@ -141,6 +145,7 @@ def test_get_invalid_client_id_throws_exception():
                   body=json.dumps(example_team_fail_resp_invalid_client_id),
                   status=400,
                   content_type='application/json')
+
     team_users = TeamUsers()
     with pytest.raises(requests.HTTPError):
         team_users.get(team_name, client_id=example_client_id)
@@ -154,6 +159,7 @@ def test_get_invalid_client_id_valid_token_throws_exception():
                   body=json.dumps(example_team_pass_resp),
                   status=200,
                   content_type='application/json')
+
     team_users = TeamUsers()
     team_users.get(team_name,
                    client_id='a',
@@ -170,6 +176,7 @@ def test_get_valid_client_id_invalid_token_gets_users():
                   body=json.dumps(example_team_pass_resp),
                   status=200,
                   content_type='application/json')
+
     team_users = TeamUsers()
     team_users.get(team_name,
                    client_id=example_client_id,
@@ -186,6 +193,7 @@ def test_get_invalid_token_throws_exception():
                   body=json.dumps(example_team_fail_resp_missing_client_id),
                   status=400,
                   content_type='application/json')
+
     team_users = TeamUsers()
     with pytest.raises(requests.HTTPError):
         team_users.get(team_name, client_id=example_client_id)
@@ -199,6 +207,7 @@ def test_get_invalid_client_id_and_token_throws_exception():
                   body=json.dumps(example_team_fail_resp_invalid_client_id),
                   status=400,
                   content_type='application/json')
+
     team_users = TeamUsers()
     with pytest.raises(requests.HTTPError):
         team_users.get(team_name)
@@ -212,6 +221,7 @@ def test_get_missing_client_id_and_token_throws_exception():
                   body=json.dumps(example_team_fail_resp_missing_client_id),
                   status=400,
                   content_type='application/json')
+
     team_users = TeamUsers()
     with pytest.raises(requests.HTTPError):
         team_users.get(team_name)

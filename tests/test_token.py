@@ -80,6 +80,7 @@ def test_token_constructor_valid_client_id_and_secret_pass(token):
                   body=json.dumps(example_app_access_token_pass_resp),
                   status=200,
                   content_type='application/json')
+    
     assert example_app_access_token == token.token
 
 
@@ -92,6 +93,7 @@ def test_token_constructor_invalid_client_id_exception_thrown():
                   ),
                   status=400,
                   content_type='application/json')
+
     with pytest.raises(requests.HTTPError):
         Token('a', example_client_secret)
 
@@ -105,6 +107,7 @@ def test_token_constructor_invalid_client_secret_exception_thrown():
                   ),
                   status=403,
                   content_type='application/json')
+
     with pytest.raises(requests.HTTPError):
         token = Token(example_client_id, 'a')
 
@@ -118,6 +121,7 @@ def test_token_constructor_missing_client_id_exception_thrown():
                   ),
                   status=400,
                   content_type='application/json')
+
     with pytest.raises(requests.HTTPError):
         token = Token(None, example_client_secret)
 
@@ -131,6 +135,7 @@ def test_token_constructor_missing_client_secret_exception_thrown():
                   ),
                   status=400,
                   content_type='application/json')
+
     with pytest.raises(requests.HTTPError):
         token = Token(example_client_id, None)
 
@@ -142,6 +147,7 @@ def test_validate_valid_ret_true(token):
                   body=json.dumps(example_token_validation_pass_resp),
                   status=200,
                   content_type='application/json')
+
     is_valid = token.validate()
     assert is_valid is True
 
@@ -153,6 +159,7 @@ def test_validate_invalid_ret_false(token):
                   body=json.dumps(example_token_validation_fail_resp),
                   status=401,
                   content_type='application/json')
+
     is_valid = token.validate()
     assert is_valid is False
 
@@ -162,6 +169,7 @@ def test_revoke_valid_token_pass(token):
     responses.add(responses.POST,
                   f'{BASE_OAUTH2_URL}/revoke',
                   status=200)
+
     token.revoke()
     assert token.token is None
 
@@ -176,6 +184,7 @@ def test_revoke_missing_token_throw_exception(token):
                   ),
                   status=400,
                   content_type='application/json')
+
     with pytest.raises(requests.HTTPError):
         token.revoke()
 
@@ -189,5 +198,6 @@ def test_revoke_invalid_token_fail(token):
                   ),
                   status=400,
                   content_type='application/json')
+
     with pytest.raises(requests.HTTPError):
         token.revoke()
