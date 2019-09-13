@@ -218,7 +218,7 @@ def test__download_clip_invalid_path_throws_exception(mocker):
 @pytest.mark.filterwarnings('ignore::UserWarning')
 def test_splice_valid_clips_success(mocker):
     result_base_name = 'result'
-    result_path = './ssssssss/'
+    result_path = './'
     clips_path = 'tests/resources/'
     mocker.patch('clip9.clipsplice.ClipSplicer._download_clip')
     mocker.patch('clip9.clipsplice.ClipSplicer._download_clip')

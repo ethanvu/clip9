@@ -1,5 +1,4 @@
 *.sw*
-*.mp4
 __pycache__/
 .coverage
 coverage.xml
