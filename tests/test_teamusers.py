@@ -9,6 +9,7 @@ import responses
 from clip9.constants import BASE_KRAKEN_URL
 from clip9.teamusers import TeamUsers
 
+
 example_client_id = 'uo6dggojyb8d6soh92zknwmi5ej1q2'
 example_app_access_token = 'prau3ol6mg5glgek8m89ec2s9q5i3i'
 

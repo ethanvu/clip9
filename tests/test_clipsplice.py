@@ -11,6 +11,7 @@ import requests
 import requests_html
 import responses
 
+
 example_clip_list = [
     {
         'id': 'AwkwardHelplessSalamanderSwiftRage',
@@ -232,7 +233,7 @@ def test_splice_valid_clips_success(mocker):
     result_file.unlink()
 
 
-def test_splice_no_clips_no_result_file(mocker):
+def test_splice_no_clips_no_result_file():
     result_base_name = 'result'
     result_path = './'
     clips_path = 'tests/resources/'

@@ -2,7 +2,7 @@
 
 import logging
 
-from moviepy.editor import concatenate_videoclips, VideoFileClip, CompositeVideoClip
+from moviepy.editor import concatenate_videoclips, VideoFileClip
 import requests
 from requests_html import HTMLSession
 
