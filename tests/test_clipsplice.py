@@ -215,36 +215,31 @@ def test__download_clip_invalid_path_throws_exception(mocker):
         splicer._download_clip(example_clip_list[0], path)
 
 
-@pytest.mark.skip
-@responses.activate
+@pytest.mark.filterwarnings('ignore::UserWarning')
 def test_splice_valid_clips_success(mocker):
-    src_url = 'https://clips-media-assets2.twitch.tv/AT-157589949-640x360.mp4'
-    src_url2 = ('https://clips-media-assets2.twitch.tv/'
-                'AT-25242479696-640x360.mp4')
     result_base_name = 'result'
-    mocker.patch('clip9.clipsplice.ClipSplicer._get_clip_src_url',
-                 return_value=src_url)
-    responses.add(responses.GET,
-                  src_url,
-                  body='a',
-                  status=200,
-                  content_type='binary/octet-stream')
-    mocker.patch('clip9.clipsplice.ClipSplicer._get_clip_src_url',
-                 return_value=src_url2)
-    responses.add(responses.GET,
-                  src_url2,
-                  body='b',
-                  status=200,
-                  content_type='binary/octet-stream')
+    result_path = './ssssssss/'
+    clips_path = 'tests/resources/'
+    mocker.patch('clip9.clipsplice.ClipSplicer._download_clip')
+    mocker.patch('clip9.clipsplice.ClipSplicer._download_clip')
 
     splicer = ClipSplicer(example_clip_list)
-    splicer.splice(result_base_name)
-    clip0_file = Path(f'{clips_path}{example_clip_list[0]["id"]}.mp4')
-    assert clip0_file.is_file()
-    clip1_file = Path(f'{clips_path}{example_clip_list[1]["id"]}.mp4')
-    assert clip1_file.is_file()
+    splicer.splice(result_base_name,
+                   result_path=result_path,
+                   clips_path=clips_path)
     result_file = Path(f'{result_path}{result_base_name}.mp4')
     assert result_file.is_file()
-    clip0_file.unlink()
-    clip1_file.unlink()
     result_file.unlink()
+
+
+def test_splice_no_clips_no_result_file(mocker):
+    result_base_name = 'result'
+    result_path = './'
+    clips_path = 'tests/resources/'
+
+    splicer = ClipSplicer([])
+    splicer.splice(result_base_name,
+                   result_path=result_path,
+                   clips_path=clips_path)
+    result_file = Path(f'{result_path}{result_base_name}.mp4')
+    assert not result_file.is_file()

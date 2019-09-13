@@ -2,7 +2,7 @@
 
 import logging
 
-from moviepy.editor import concatenate_videoclips, VideoFileClip
+from moviepy.editor import concatenate_videoclips, VideoFileClip, CompositeVideoClip
 import requests
 from requests_html import HTMLSession
 
@@ -64,10 +64,17 @@ class ClipSplicer():
         :param result_path: Directory path to save the result file in.
         :param clips_path: Directory path to save the clip files in.
         """
+        logging.info(f"Splicing {len(self.clips_list)} clips")
         file_list = []
         for clip in self.clips_list:
             self._download_clip(clip, clips_path)
             clip_file = VideoFileClip(f'{clips_path}/{clip["id"]}.mp4')
             file_list.append(clip_file)
-        result_clip = concatenate_videoclips(file_list)
-        result_clip.write_videofile(f'{result_path}/{result_base_name}.mp4')
+
+        if (len(file_list) > 0):
+            result_clip = concatenate_videoclips(file_list)
+            logging.info(f"Writing {result_path}/{result_base_name}.mp4")
+            result_clip.write_videofile(f'{result_path}/'
+                                        f'{result_base_name}.mp4')
+        else:
+            logging.info("No clips to splice")
