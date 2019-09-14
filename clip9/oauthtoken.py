@@ -1,4 +1,4 @@
-"""Module for the Token class.
+"""Module for the OauthToken class.
 
 A Twitch development client ID and secret are required to use this
 class. More info can be found below: 
@@ -12,7 +12,7 @@ import requests
 from clip9.constants import BASE_OAUTH2_URL
 
 
-class Token:
+class OauthToken:
     """A Twitch app access token.  Once the token instance has called
     revoke(), the instance is useless and shouldn't be used anymore.
     """
