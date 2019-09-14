@@ -14,6 +14,6 @@ class Users:
         :param client_id: Twitch developer client ID.
         :param oauth_token: Twitch developer OAuth2 token.
         :returns: A list of dictionaries, each representing a Twitch
-            user.
+                  user.
         """
         raise NotImplementedError

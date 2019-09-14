@@ -17,9 +17,10 @@ class ClipGetter:
         """Initializes a new ClipGetter
 
         :param users_list: List of dictionaries of information of users.
-        :param started_at: Beginning of time window of clips to get.  RFC 3339
-            format.
-        :param ended_at: End of time window of clips to get.  RFC 3339 format.
+        :param started_at: Beginning of time window of clips to get in
+                           RFC 3339 format.
+        :param ended_at: End of time window of clips to get in RFC 3339
+                         format.
         :param lang: Language of clips to get.  Default is all languages.
         """
         self.users_list = users_list

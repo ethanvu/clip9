@@ -14,14 +14,15 @@ class TeamUsers(Users):
         """Gets a list of users given a team name.
 
         :param *args: First arg is the name of the team, rest are
-            ignored.
+                      ignored.
         :param client_id: Twitch developer client ID.
         :param oauth_token: Twitch developer OAuth2 token.
         :returns: A list of dictionaries, each representing a Twitch
-            user.
+                  user.
         :raises TypeError: When the first arg is None.
         :raises requests.HTTPError: When there is an error
-            communicating with the Twitch Kraken API.
+                                    communicating with the Twitch
+                                    Kraken API.
         """
         logging.info(f"Getting users from team {args[0]}")
         if args[0] is None:
