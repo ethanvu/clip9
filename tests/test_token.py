@@ -1,4 +1,4 @@
-"""Tests token.py"""
+"""Tests the token module."""
 
 import json
 

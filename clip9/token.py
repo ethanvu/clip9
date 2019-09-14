@@ -1,7 +1,7 @@
-"""Contains a class for a Twitch app access token.  A Twitch development client
-ID and secret are required to use this class.
+"""Module for the Token class.
 
-More info can be found here: 
+A Twitch development client ID and secret are required to use this
+class. More info can be found below: 
 https://dev.twitch.tv/docs/authentication/getting-tokens-oauth/#oauth-client-credentials-flow
 """
 
@@ -13,8 +13,8 @@ from clip9.constants import BASE_OAUTH2_URL
 
 
 class Token:
-    """A Twitch app access token.  Once the token instance has called revoke(),
-    the instance is useless and shouldn't be used anymore.
+    """A Twitch app access token.  Once the token instance has called
+    revoke(), the instance is useless and shouldn't be used anymore.
     """
 
     def __init__(self, client_id, client_secret):

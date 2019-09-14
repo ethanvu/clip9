@@ -1,4 +1,4 @@
-"""Tests clipget.py"""
+"""Tests the clipget module."""
 
 import json
 

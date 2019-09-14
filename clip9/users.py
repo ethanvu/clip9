@@ -13,6 +13,7 @@ class Users:
         :param *args: Used to identify which users to return.
         :param client_id: Twitch developer client ID.
         :param oauth_token: Twitch developer OAuth2 token.
-        :returns: A list of dictionaries, each representing a Twitch user.
+        :returns: A list of dictionaries, each representing a Twitch
+            user.
         """
         raise NotImplementedError

@@ -1,4 +1,4 @@
-"""Tests teamusers.py."""
+"""Tests the teamusers module."""
 
 import json
 

@@ -1,7 +1,5 @@
 """Tests the clipsplice module."""
 
-from clip9.clipsplice import ClipSplicer
-
 from pathlib import Path
 from unittest.mock import patch, mock_open
 
@@ -10,6 +8,8 @@ from pytest_mock import mocker
 import requests
 import requests_html
 import responses
+
+from clip9.clipsplice import ClipSplicer
 
 
 example_clip_list = [

@@ -7,6 +7,7 @@ import requests
 
 from clip9.constants import BASE_TWITCHMETRICS_URL
 
+
 class ClipGetter:
     """Gets 'good' clips for streamers in a Twitch team since a certain
     time until now.
@@ -116,7 +117,8 @@ class ClipGetter:
 
 
     def get_clips(self, client_id=None, oauth_token=None):
-        """Return a list of information of 'good' clips from a list of users.
+        """Return a list of information of 'good' clips from a list of
+        users.
         
         The format of the information of each clip can be found here:
         https://dev.twitch.tv/docs/api/reference/#get-clips

@@ -2,8 +2,10 @@
 
 import logging
 
-from clip9.users import Users
 from twitch import TwitchClient
+
+from clip9.users import Users
+
 
 class TeamUsers(Users):
     """Represents a list of Twitch users in a team."""
@@ -11,13 +13,15 @@ class TeamUsers(Users):
     def get(self, *args, client_id=None, oauth_token=None):
         """Gets a list of users given a team name.
 
-        :param *args: First arg is the name of the team, rest are ignored.
+        :param *args: First arg is the name of the team, rest are
+            ignored.
         :param client_id: Twitch developer client ID.
         :param oauth_token: Twitch developer OAuth2 token.
-        :returns: A list of dictionaries, each representing a Twitch user.
+        :returns: A list of dictionaries, each representing a Twitch
+            user.
         :raises TypeError: When the first arg is None.
-        :raises requests.HTTPError: When there is an error communicating with
-            the Twitch Kraken API.
+        :raises requests.HTTPError: When there is an error
+            communicating with the Twitch Kraken API.
         """
         logging.info(f"Getting users from team {args[0]}")
         if args[0] is None:
