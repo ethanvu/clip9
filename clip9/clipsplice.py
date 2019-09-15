@@ -35,7 +35,7 @@ class ClipSplicer():
 
 
     def _download_clip(self, clip, path):
-        """Downloads a clip as an MP4 file.
+        """Downloads a clip as an mp4 file.
 
         :param clip: Info of a clip recieved from the Twitch Helix API.
         :param path: Path to save the clip in.
@@ -57,7 +57,8 @@ class ClipSplicer():
 
 
     def splice(self, result_file_name, clips_path='./'):
-        """Splices the clips in clips_list into an mp4 file.
+        """Splices the clips in clips_list into an mp4, ogv, webm, or
+        avi file.
 
         :param result_file_name: File name of the resulting video,
                                  e.g. ./result.mp4 or /var/tmp/final.avi
@@ -73,6 +74,9 @@ class ClipSplicer():
         if (len(file_list) > 0):
             result = concatenate_videoclips(file_list)
             logging.info(f"Writing {result_file_name}")
-            result.write_videofile(f'{result_file_name}')
+            if (result_file_name[-4:] == '.avi'):
+                result.write_videofile(f'{result_file_name}', codec='png')
+            else:
+                result.write_videofile(f'{result_file_name}')
         else:
             logging.info("No clips to splice")

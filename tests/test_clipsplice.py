@@ -217,8 +217,53 @@ def test__download_clip_invalid_path_throws_exception(mocker):
 
 
 @pytest.mark.filterwarnings('ignore::UserWarning')
-def test_splice_valid_clips_success(mocker):
+def test_splice_valid_clips_mp4_success(mocker):
     result_file_name = './result.mp4'
+    clips_path = 'tests/resources/'
+    mocker.patch('clip9.clipsplice.ClipSplicer._download_clip')
+    mocker.patch('clip9.clipsplice.ClipSplicer._download_clip')
+
+    splicer = ClipSplicer(example_clip_list)
+    splicer.splice(result_file_name,
+                   clips_path=clips_path)
+    result_file = Path(f'{result_file_name}')
+    assert result_file.is_file()
+    result_file.unlink()
+
+
+@pytest.mark.filterwarnings('ignore::UserWarning')
+def test_splice_valid_clips_ogv_success(mocker):
+    result_file_name = './result.ogv'
+    clips_path = 'tests/resources/'
+    mocker.patch('clip9.clipsplice.ClipSplicer._download_clip')
+    mocker.patch('clip9.clipsplice.ClipSplicer._download_clip')
+
+    splicer = ClipSplicer(example_clip_list)
+    splicer.splice(result_file_name,
+                   clips_path=clips_path)
+    result_file = Path(f'{result_file_name}')
+    assert result_file.is_file()
+    result_file.unlink()
+
+
+@pytest.mark.filterwarnings('ignore::UserWarning')
+def test_splice_valid_clips_webm_success(mocker):
+    result_file_name = './result.webm'
+    clips_path = 'tests/resources/'
+    mocker.patch('clip9.clipsplice.ClipSplicer._download_clip')
+    mocker.patch('clip9.clipsplice.ClipSplicer._download_clip')
+
+    splicer = ClipSplicer(example_clip_list)
+    splicer.splice(result_file_name,
+                   clips_path=clips_path)
+    result_file = Path(f'{result_file_name}')
+    assert result_file.is_file()
+    result_file.unlink()
+
+
+@pytest.mark.filterwarnings('ignore::UserWarning')
+def test_splice_valid_clips_avi_success(mocker):
+    result_file_name = './result.avi'
     clips_path = 'tests/resources/'
     mocker.patch('clip9.clipsplice.ClipSplicer._download_clip')
     mocker.patch('clip9.clipsplice.ClipSplicer._download_clip')
