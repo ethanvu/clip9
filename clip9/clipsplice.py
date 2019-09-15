@@ -56,12 +56,11 @@ class ClipSplicer():
         logging.info(f"Downloaded {clip['id']}.mp4")
 
 
-    def splice(self, result_base_name, result_path='./', clips_path='./'):
+    def splice(self, result_file_name, clips_path='./'):
         """Splices the clips in clips_list into an mp4 file.
 
-        :param result_base_name: Base name of the resulting clip,
-                                 e.g. AwkwardHelplessSalamanderSwiftRage
-        :param result_path: Directory path to save the result file in.
+        :param result_file_name: File name of the resulting video,
+                                 e.g. ./result.mp4 or /var/tmp/final.avi
         :param clips_path: Directory path to save the clip files in.
         """
         logging.info(f"Splicing {len(self.clips_list)} clips")
@@ -72,9 +71,8 @@ class ClipSplicer():
             file_list.append(clip_file)
 
         if (len(file_list) > 0):
-            result_clip = concatenate_videoclips(file_list)
-            logging.info(f"Writing {result_path}/{result_base_name}.mp4")
-            result_clip.write_videofile(f'{result_path}/'
-                                        f'{result_base_name}.mp4')
+            result = concatenate_videoclips(file_list)
+            logging.info(f"Writing {result_file_name}")
+            result.write_videofile(f'{result_file_name}')
         else:
             logging.info("No clips to splice")

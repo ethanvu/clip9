@@ -218,29 +218,25 @@ def test__download_clip_invalid_path_throws_exception(mocker):
 
 @pytest.mark.filterwarnings('ignore::UserWarning')
 def test_splice_valid_clips_success(mocker):
-    result_base_name = 'result'
-    result_path = './'
+    result_file_name = './result.mp4'
     clips_path = 'tests/resources/'
     mocker.patch('clip9.clipsplice.ClipSplicer._download_clip')
     mocker.patch('clip9.clipsplice.ClipSplicer._download_clip')
 
     splicer = ClipSplicer(example_clip_list)
-    splicer.splice(result_base_name,
-                   result_path=result_path,
+    splicer.splice(result_file_name,
                    clips_path=clips_path)
-    result_file = Path(f'{result_path}{result_base_name}.mp4')
+    result_file = Path(f'{result_file_name}')
     assert result_file.is_file()
     result_file.unlink()
 
 
 def test_splice_no_clips_no_result_file():
-    result_base_name = 'result'
-    result_path = './'
+    result_file_name = './result.mp4'
     clips_path = 'tests/resources/'
 
     splicer = ClipSplicer([])
-    splicer.splice(result_base_name,
-                   result_path=result_path,
+    splicer.splice(result_file_name,
                    clips_path=clips_path)
-    result_file = Path(f'{result_path}{result_base_name}.mp4')
+    result_file = Path(f'{result_file_name}')
     assert not result_file.is_file()
