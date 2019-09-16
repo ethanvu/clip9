@@ -363,29 +363,6 @@ def test__get_good_clips_invalid_client_id_and_token_throw_exception():
 
 @responses.activate
 def test__get_good_clips_valid_started_at_ret_clips():
-    responses.add(responses.GET,
-                  f'{BASE_TWITCHMETRICS_URL}c/{example_users_list[0]["_id"]}-'
-                  f'{example_users_list[0]["name"]}/recent_viewership_values',
-                  body=json.dumps(example_twitchmetrics_viewership_resp),
-                  status=200,
-                  content_type='application/json')
-    responses.add(responses.GET,
-                  f'{BASE_HELIX_URL}clips?'
-                  f'broadcaster_id={example_users_list[0]["_id"]}',
-                  body=json.dumps(example_clips_resp),
-                  status=200,
-                  content_type='application/json')
-
-    getter = ClipGetter(example_users_list)
-    clips = getter._get_good_clips(example_users_list[0]["_id"],
-                                   example_users_list[0]["name"],
-                                   oauth_token=example_app_access_token)
-    assert len(clips) == 1
-    assert clips[0]['id'] == 'RandomClip1'
-
-
-@responses.activate
-def test__get_good_clips_valid_started_at_ret_clips():
     started_at = '2019-08-19T00:00:00Z'
     responses.add(responses.GET,
                   f'{BASE_TWITCHMETRICS_URL}c/{example_users_list[0]["_id"]}-'
