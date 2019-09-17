@@ -137,14 +137,17 @@ def test__parse_credentials_cfg_file_doesnt_exist_exit():
 
 def test__parse_credentials_cfg_file_no_creds_header_exit():
     with pytest.raises(SystemExit):
-        credentials = clip9._parse_credentials_cfg('no_creds_header.cfg')
+        credentials = clip9._parse_credentials_cfg('tests/resources/'
+                                                   'no_creds_header.cfg')
 
 
 def test__parse_credentials_cfg_file_no_id_key_exit():
     with pytest.raises(SystemExit):
-        credentials = clip9._parse_credentials_cfg('no_id_key.cfg')
+        credentials = clip9._parse_credentials_cfg('tests/resources/'
+                                                   'no_id_key.cfg')
 
 
 def test__parse_credentials_cfg_file_no_secret_key_exit():
     with pytest.raises(SystemExit):
-        credentials = clip9._parse_credentials_cfg('no_secret_key.cfg')
+        credentials = clip9._parse_credentials_cfg('tests/resources/'
+                                                   'no_secret_key.cfg')
