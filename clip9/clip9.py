@@ -3,7 +3,10 @@ splices them into a video, and then upload it to YouTube.
 """
 
 from argparse import ArgumentParser
+from configparser import ConfigParser
 import logging
+import os
+import sys
 
 
 def handle_exception(type, value, traceback):
@@ -46,7 +49,32 @@ def _parse_args():
 
 def main():
     args = _parse_args()
+    logging.basicConfig(level=logging.DEBUG, filename=args.log_file, 
+                        format='[%(asctime)s]%(levelname)s: %(message)s')
+    sys.excepthook = handle_exception
+
     logging.info("-------STARTING CLIP9 MAIN SCRIPT-------")
+
+    cfg_file_name = f'{os.path.dirname(sys.argv[0])}/../credentials.cfg'
+    logging.info(f'config file name: {cfg_file_name}')
+    logging.info("Loading credentials.cfg")
+    config = ConfigParser()
+    config.read(cfg_file_name)
+    logging.info("credentials.cfg loaded")
+    credentials = config['credentials']
+
+    if ('TWITCH_CLIENT_ID' not in credentials):
+        logging.error("credentials.cfg does not contain TWITCH_CLIENT_ID")
+        exit(1)
+    logging.info("Loaded TWITCH_CLIENT_ID")
+
+    if ('TWITCH_CLIENT_SECRET' not in credentials):
+        logging.error("credentials.cfg does not contain TWITCH_CLIENT_SECRET")
+        exit(1)
+    logging.info("Loaded TWITCH_CLIENT_SECRET")
+
+    twitch_client_id = credentials['TWITCH_CLIENT_ID']
+    twitch_client_secret = credentials['TWITCH_CLIENT_SECRET']
 
 
 if __name__ == '__main__':

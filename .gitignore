@@ -1,7 +1,18 @@
-*.sw*
-__pycache__/
+# codecov
 .coverage
 coverage.xml
-env/
-logs/
+
+# credentials
+credentials.cfg
+
+# other
 notes/
+
+# python
+__pycache__/
+
+# vim
+*.sw*
+
+# virtualenv
+env/
