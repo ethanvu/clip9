@@ -47,20 +47,15 @@ def _parse_args():
     return args
 
 
-def main():
-    args = _parse_args()
-    logging.basicConfig(level=logging.DEBUG, filename=args.log_file, 
-                        format='[%(asctime)s]%(levelname)s: %(message)s')
-    sys.excepthook = handle_exception
+def _parse_credentials_cfg(cfg_file_name):
+    logging.info(f'Loading {cfg_file_name}')
+    if (not os.path.isfile(cfg_file_name)):
+        logging.error(f"{cfg_file_name} doesn't exist")
+        exit(1)
 
-    logging.info("-------STARTING CLIP9 MAIN SCRIPT-------")
-
-    cfg_file_name = f'{os.path.dirname(sys.argv[0])}/../credentials.cfg'
-    logging.info(f'config file name: {cfg_file_name}')
-    logging.info("Loading credentials.cfg")
     config = ConfigParser()
     config.read(cfg_file_name)
-    logging.info("credentials.cfg loaded")
+    logging.info(f'Loaded {cfg_file_name}')
     credentials = config['credentials']
 
     if ('TWITCH_CLIENT_ID' not in credentials):
@@ -73,6 +68,19 @@ def main():
         exit(1)
     logging.info("Loaded TWITCH_CLIENT_SECRET")
 
+    return credentials
+
+
+def main():
+    args = _parse_args()
+    logging.basicConfig(level=logging.DEBUG, filename=args.log_file, 
+                        format='[%(asctime)s]%(levelname)s: %(message)s')
+    sys.excepthook = handle_exception
+
+    logging.info("-------STARTING CLIP9 MAIN SCRIPT-------")
+
+    cfg_file_name = f'{os.path.dirname(sys.argv[0])}/../credentials.cfg'
+    credentials = _parse_credentials_cfg(cfg_file_name)
     twitch_client_id = credentials['TWITCH_CLIENT_ID']
     twitch_client_secret = credentials['TWITCH_CLIENT_SECRET']
 

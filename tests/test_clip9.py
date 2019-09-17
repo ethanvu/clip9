@@ -1,5 +1,7 @@
 """Tests the clip9 module."""
 
+from configparser import ConfigParser
+import os
 import sys
 
 import pytest
@@ -120,3 +122,29 @@ def test__parse_args_log_file_short_success():
     assert args.ended_at == None
     assert args.clips_dir == './'
     assert args.log_file == 'clip9.log'
+
+
+def test__parse_credentials_cfg_file_exists_ret_creds():
+    credentials = clip9._parse_credentials_cfg('credentials_template.cfg')
+    assert credentials['TWITCH_CLIENT_ID'] == 'uo6dggojyb8d6soh92zknwmi5ej1q2'
+    assert credentials['TWITCH_CLIENT_SECRET'] == 'nyo51xcdrerl8z9m56w9w6wg'
+
+
+def test__parse_credentials_cfg_file_doesnt_exist_exit():
+    with pytest.raises(SystemExit):
+        credentials = clip9._parse_credentials_cfg('doesnt_exist.cfg')
+
+
+def test__parse_credentials_cfg_file_no_creds_header_exit():
+    with pytest.raises(SystemExit):
+        credentials = clip9._parse_credentials_cfg('no_creds_header.cfg')
+
+
+def test__parse_credentials_cfg_file_no_id_key_exit():
+    with pytest.raises(SystemExit):
+        credentials = clip9._parse_credentials_cfg('no_id_key.cfg')
+
+
+def test__parse_credentials_cfg_file_no_secret_key_exit():
+    with pytest.raises(SystemExit):
+        credentials = clip9._parse_credentials_cfg('no_secret_key.cfg')
