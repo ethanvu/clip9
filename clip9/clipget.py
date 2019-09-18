@@ -27,7 +27,6 @@ class ClipGetter:
         self.started_at = started_at
         self.ended_at = ended_at
         self.lang = lang
-        self.clips_list = None
 
 
     def _get_avg_viewers_in_past_week(self, user_id, user_name):

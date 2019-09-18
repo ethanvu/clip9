@@ -17,6 +17,7 @@ def test__parse_args_team_output_file_no_start_time_success():
     assert args.started_at == None
     assert args.ended_at == None
     assert args.clips_dir == './'
+    assert args.lang == None
     assert args.log_file == None
 
 
@@ -41,6 +42,7 @@ def test__parse_args_started_at_success():
     assert args.started_at == '2008-09-08T22:47:31Z'
     assert args.ended_at == None
     assert args.clips_dir == './'
+    assert args.lang == None
     assert args.log_file == None
 
 
@@ -53,6 +55,7 @@ def test__parse_args_started_at_short_success():
     assert args.started_at == '2008-09-08T22:47:31Z'
     assert args.ended_at == None
     assert args.clips_dir == './'
+    assert args.lang == None
     assert args.log_file == None
 
 
@@ -65,6 +68,7 @@ def test__parse_args_ended_at_success():
     assert args.started_at == None
     assert args.ended_at == '2008-09-08T22:47:31Z'
     assert args.clips_dir == './'
+    assert args.lang == None
     assert args.log_file == None
 
 
@@ -77,6 +81,7 @@ def test__parse_args_ended_at_short_success():
     assert args.started_at == None
     assert args.ended_at == '2008-09-08T22:47:31Z'
     assert args.clips_dir == './'
+    assert args.lang == None
     assert args.log_file == None
 
 
@@ -88,6 +93,7 @@ def test__parse_args_clip_dir_success():
     assert args.started_at == None
     assert args.ended_at == None
     assert args.clips_dir == './clips'
+    assert args.lang == None
     assert args.log_file == None
 
 
@@ -99,6 +105,31 @@ def test__parse_args_clip_dir_short_success():
     assert args.started_at == None
     assert args.ended_at == None
     assert args.clips_dir == './clips'
+    assert args.lang == None
+    assert args.log_file == None
+
+
+def test__parse_args_lang_success():
+    sys.argv = ['clip9.py', 'result.mp4', 'cloud9', '--lang', 'en']
+    args = clip9._parse_args()
+    assert args.output_file == 'result.mp4'
+    assert args.team == 'cloud9'
+    assert args.started_at == None
+    assert args.ended_at == None
+    assert args.clips_dir == './'
+    assert args.lang == 'en'
+    assert args.log_file == None
+
+
+def test__parse_args_lang_short_success():
+    sys.argv = ['clip9.py', 'result.mp4', 'cloud9', '-l', 'en']
+    args = clip9._parse_args()
+    assert args.output_file == 'result.mp4'
+    assert args.team == 'cloud9'
+    assert args.started_at == None
+    assert args.ended_at == None
+    assert args.clips_dir == './'
+    assert args.lang == 'en'
     assert args.log_file == None
 
 
@@ -110,17 +141,19 @@ def test__parse_args_log_file_success():
     assert args.started_at == None
     assert args.ended_at == None
     assert args.clips_dir == './'
+    assert args.lang == None
     assert args.log_file == 'clip9.log'
 
 
 def test__parse_args_log_file_short_success():
-    sys.argv = ['clip9.py', 'result.mp4', 'cloud9', '-l', 'clip9.log']
+    sys.argv = ['clip9.py', 'result.mp4', 'cloud9', '-L', 'clip9.log']
     args = clip9._parse_args()
     assert args.output_file == 'result.mp4'
     assert args.team == 'cloud9'
     assert args.started_at == None
     assert args.ended_at == None
     assert args.clips_dir == './'
+    assert args.lang == None
     assert args.log_file == 'clip9.log'
 
 

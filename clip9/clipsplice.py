@@ -56,19 +56,19 @@ class ClipSplicer():
         logging.info(f"Downloaded {clip['id']}.mp4")
 
 
-    def splice(self, result_file_name, clips_path='./'):
+    def splice(self, result_file_name, clips_dir='./'):
         """Splices the clips in clips_list into an mp4, ogv, webm, or
         avi file.
 
         :param result_file_name: File name of the resulting video,
                                  e.g. ./result.mp4 or /var/tmp/final.avi
-        :param clips_path: Directory path to save the clip files in.
+        :param clips_dir: Directory path to save the clip files in.
         """
         logging.info(f"Splicing {len(self.clips_list)} clips")
         file_list = []
         for clip in self.clips_list:
-            self._download_clip(clip, clips_path)
-            clip_file = VideoFileClip(f'{clips_path}/{clip["id"]}.mp4')
+            self._download_clip(clip, clips_dir)
+            clip_file = VideoFileClip(f'{clips_dir}/{clip["id"]}.mp4')
             file_list.append(clip_file)
 
         if (len(file_list) > 0):

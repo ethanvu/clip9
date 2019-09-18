@@ -8,6 +8,11 @@ import logging
 import os
 import sys
 
+from clip9.clipget import ClipGetter
+from clip9.clipsplice import ClipSplicer
+from clip9.oauthtoken import OauthToken
+from clip9.teamusers import TeamUsers
+
 
 def handle_exception(type, value, traceback):
     logging.error(f"Uncaught exception", exc_info=(type, value, traceback))
@@ -38,7 +43,10 @@ def _parse_args():
     parser.add_argument('-c', '--clips_dir',
                         action='store',
                         help="Directory to download the clips into.")
-    parser.add_argument('-l', '--log_file',
+    parser.add_argument('-l', '--lang',
+                        action='store',
+                        help="Language of clips to get.")
+    parser.add_argument('-L', '--log_file',
                         action='store',
                         help="Name of the log file.")
     args = parser.parse_args()
@@ -81,8 +89,20 @@ def main():
 
     cfg_file_name = f'{os.path.dirname(sys.argv[0])}/../credentials.cfg'
     credentials = _parse_credentials_cfg(cfg_file_name)
-    twitch_client_id = credentials['TWITCH_CLIENT_ID']
-    twitch_client_secret = credentials['TWITCH_CLIENT_SECRET']
+    client_id = credentials['TWITCH_CLIENT_ID']
+    client_secret = credentials['TWITCH_CLIENT_SECRET']
+
+    token = OauthToken(client_id, client_secret)
+    if (not token.validate()):
+        logging.error("Token isn't valid")
+        exit(1)
+    users_list = TeamUsers(args.team, client_id, token.token).users_list
+    getter = ClipGetter(users_list, started_at=args.started_at,
+                        ended_at=args.ended_at, lang=args.lang)
+    clips_list = clipgetter.get_clips(client_id, token.token)
+    splicer = ClipSplicer(clips_list)
+    splicer.splice(args.output_file, args.clips_dir)
+    token.revoke()
 
 
 if __name__ == '__main__':
