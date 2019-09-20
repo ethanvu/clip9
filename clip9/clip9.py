@@ -96,7 +96,9 @@ def main():
     if (not token.validate()):
         logging.error("Token isn't valid")
         exit(1)
-    users_list = TeamUsers(args.team, client_id, token.token).users_list
+    team_users = TeamUsers()
+    team_users.get(args.team, client_id=client_id, oauth_token=token.token)
+    users_list = team_users.users_list
     getter = ClipGetter(users_list, started_at=args.started_at,
                         ended_at=args.ended_at, lang=args.lang)
     clips_list = clipgetter.get_clips(client_id, token.token)
