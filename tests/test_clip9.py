@@ -1,12 +1,11 @@
 """Tests the clip9 module."""
 
 from configparser import ConfigParser
-import os
 import sys
 
 import pytest
 
-from clip9 import clip9
+import clip9
 
 
 def test__parse_args_team_output_file_no_start_time_success():

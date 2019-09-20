@@ -6,8 +6,8 @@ import pytest
 import requests
 import responses
 
-from clip9.constants import BASE_OAUTH2_URL
-from clip9.oauthtoken import OauthToken
+from constants import BASE_OAUTH2_URL
+from oauthtoken import OauthToken
 
 
 example_client_id = 'uo6dggojyb8d6soh92zknwmi5ej1q2'

@@ -6,8 +6,8 @@ import pytest
 import requests
 import responses
 
-from clip9.constants import BASE_KRAKEN_URL
-from clip9.teamusers import TeamUsers
+from constants import BASE_KRAKEN_URL
+from teamusers import TeamUsers
 
 
 example_client_id = 'uo6dggojyb8d6soh92zknwmi5ej1q2'

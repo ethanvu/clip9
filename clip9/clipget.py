@@ -5,7 +5,7 @@ import math
 
 import requests
 
-from clip9.constants import BASE_TWITCHMETRICS_URL
+from constants import BASE_TWITCHMETRICS_URL
 
 
 class ClipGetter:

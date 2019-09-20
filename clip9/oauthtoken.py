@@ -9,7 +9,7 @@ import logging
 
 import requests
 
-from clip9.constants import BASE_OAUTH2_URL
+from constants import BASE_OAUTH2_URL
 
 
 class OauthToken:

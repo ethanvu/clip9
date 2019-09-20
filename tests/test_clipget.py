@@ -6,9 +6,9 @@ import pytest
 import requests
 import responses
 
-from clip9.constants import BASE_HELIX_URL
-from clip9.constants import BASE_TWITCHMETRICS_URL
-from clip9.clipget import ClipGetter
+from constants import BASE_HELIX_URL
+from constants import BASE_TWITCHMETRICS_URL
+from clipget import ClipGetter
 
 
 example_client_id = 'uo6dggojyb8d6soh92zknwmi5ej1q2'

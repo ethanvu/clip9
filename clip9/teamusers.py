@@ -4,7 +4,7 @@ import logging
 
 from twitch import TwitchClient
 
-from clip9.users import Users
+from users import Users
 
 
 class TeamUsers(Users):

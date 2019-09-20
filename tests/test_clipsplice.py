@@ -9,7 +9,7 @@ import requests
 import requests_html
 import responses
 
-from clip9.clipsplice import ClipSplicer
+from clipsplice import ClipSplicer
 
 
 example_clip_list = [
@@ -167,7 +167,7 @@ def test__get_clip_src_url_failed_connection_throws_exception(mocker):
 def test__download_clip_valid_url_success(mocker):
     src_url = 'https://clips-media-assets2.twitch.tv/AT-157589949-640x360.mp4'
     path = './'
-    mocker.patch('clip9.clipsplice.ClipSplicer._get_clip_src_url',
+    mocker.patch('clipsplice.ClipSplicer._get_clip_src_url',
                  return_value=src_url)
     responses.add(responses.GET,
                   src_url,
@@ -186,7 +186,7 @@ def test__download_clip_valid_url_success(mocker):
 def test__download_clip_invalid_url_throws_exception(mocker):
     src_url = 'https://clips-media-assets2.twitch.tv/AT-157589949-640x360.mp4'
     path = './'
-    mocker.patch('clip9.clipsplice.ClipSplicer._get_clip_src_url',
+    mocker.patch('clipsplice.ClipSplicer._get_clip_src_url',
                  return_value=src_url)
     responses.add(responses.GET,
                   src_url,
@@ -203,7 +203,7 @@ def test__download_clip_invalid_url_throws_exception(mocker):
 def test__download_clip_invalid_path_throws_exception(mocker):
     src_url = 'https://clips-media-assets2.twitch.tv/AT-157589949-640x360.mp4'
     path = '/badpath/'
-    mocker.patch('clip9.clipsplice.ClipSplicer._get_clip_src_url',
+    mocker.patch('clipsplice.ClipSplicer._get_clip_src_url',
                  return_value=src_url)
     responses.add(responses.GET,
                   src_url,
@@ -220,8 +220,8 @@ def test__download_clip_invalid_path_throws_exception(mocker):
 def test_splice_valid_clips_mp4_success(mocker):
     result_file_name = './result.mp4'
     clips_dir = 'tests/resources/'
-    mocker.patch('clip9.clipsplice.ClipSplicer._download_clip')
-    mocker.patch('clip9.clipsplice.ClipSplicer._download_clip')
+    mocker.patch('clipsplice.ClipSplicer._download_clip')
+    mocker.patch('clipsplice.ClipSplicer._download_clip')
 
     splicer = ClipSplicer(example_clip_list)
     splicer.splice(result_file_name,
@@ -235,8 +235,8 @@ def test_splice_valid_clips_mp4_success(mocker):
 def test_splice_valid_clips_ogv_success(mocker):
     result_file_name = './result.ogv'
     clips_dir = 'tests/resources/'
-    mocker.patch('clip9.clipsplice.ClipSplicer._download_clip')
-    mocker.patch('clip9.clipsplice.ClipSplicer._download_clip')
+    mocker.patch('clipsplice.ClipSplicer._download_clip')
+    mocker.patch('clipsplice.ClipSplicer._download_clip')
 
     splicer = ClipSplicer(example_clip_list)
     splicer.splice(result_file_name,
@@ -250,8 +250,8 @@ def test_splice_valid_clips_ogv_success(mocker):
 def test_splice_valid_clips_webm_success(mocker):
     result_file_name = './result.webm'
     clips_dir = 'tests/resources/'
-    mocker.patch('clip9.clipsplice.ClipSplicer._download_clip')
-    mocker.patch('clip9.clipsplice.ClipSplicer._download_clip')
+    mocker.patch('clipsplice.ClipSplicer._download_clip')
+    mocker.patch('clipsplice.ClipSplicer._download_clip')
 
     splicer = ClipSplicer(example_clip_list)
     splicer.splice(result_file_name,
@@ -265,8 +265,8 @@ def test_splice_valid_clips_webm_success(mocker):
 def test_splice_valid_clips_avi_success(mocker):
     result_file_name = './result.avi'
     clips_dir = 'tests/resources/'
-    mocker.patch('clip9.clipsplice.ClipSplicer._download_clip')
-    mocker.patch('clip9.clipsplice.ClipSplicer._download_clip')
+    mocker.patch('clipsplice.ClipSplicer._download_clip')
+    mocker.patch('clipsplice.ClipSplicer._download_clip')
 
     splicer = ClipSplicer(example_clip_list)
     splicer.splice(result_file_name,

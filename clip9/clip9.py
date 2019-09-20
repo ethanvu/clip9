@@ -8,10 +8,10 @@ import logging
 import os
 import sys
 
-from clip9.clipget import ClipGetter
-from clip9.clipsplice import ClipSplicer
-from clip9.oauthtoken import OauthToken
-from clip9.teamusers import TeamUsers
+from clipget import ClipGetter
+from clipsplice import ClipSplicer
+from oauthtoken import OauthToken
+from teamusers import TeamUsers
 
 
 def handle_exception(type, value, traceback):
