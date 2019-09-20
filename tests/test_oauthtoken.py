@@ -65,7 +65,7 @@ example_token_revoke_fail_resp_invalid_token = {
 @responses.activate
 def token():
     responses.add(responses.POST,
-                  f'{BASE_OAUTH2_URL}/token',
+                  f'{BASE_OAUTH2_URL}token',
                   body=json.dumps(example_app_access_token_pass_resp),
                   status=200,
                   content_type='application/json')
@@ -76,7 +76,7 @@ def token():
 @responses.activate
 def test_token_constructor_valid_client_id_and_secret_pass(token):
     responses.add(responses.POST,
-                  f'{BASE_OAUTH2_URL}/token',
+                  f'{BASE_OAUTH2_URL}token',
                   body=json.dumps(example_app_access_token_pass_resp),
                   status=200,
                   content_type='application/json')
@@ -87,7 +87,7 @@ def test_token_constructor_valid_client_id_and_secret_pass(token):
 @responses.activate
 def test_token_constructor_invalid_client_id_exception_thrown():
     responses.add(responses.POST,
-                  f'{BASE_OAUTH2_URL}/token',
+                  f'{BASE_OAUTH2_URL}token',
                   body=json.dumps(
                       example_app_access_token_fail_resp_invalid_client_id
                   ),
@@ -101,7 +101,7 @@ def test_token_constructor_invalid_client_id_exception_thrown():
 @responses.activate
 def test_token_constructor_invalid_client_secret_exception_thrown():
     responses.add(responses.POST,
-                  f'{BASE_OAUTH2_URL}/token',
+                  f'{BASE_OAUTH2_URL}token',
                   body=json.dumps(
                       example_app_access_token_fail_resp_invalid_client_secret
                   ),
@@ -115,7 +115,7 @@ def test_token_constructor_invalid_client_secret_exception_thrown():
 @responses.activate
 def test_token_constructor_missing_client_id_exception_thrown():
     responses.add(responses.POST,
-                  f'{BASE_OAUTH2_URL}/token',
+                  f'{BASE_OAUTH2_URL}token',
                   body=json.dumps(
                       example_app_access_token_fail_resp_missing_client_id
                   ),
@@ -129,7 +129,7 @@ def test_token_constructor_missing_client_id_exception_thrown():
 @responses.activate
 def test_token_constructor_missing_client_secret_exception_thrown():
     responses.add(responses.POST,
-                  f'{BASE_OAUTH2_URL}/token',
+                  f'{BASE_OAUTH2_URL}token',
                   body=json.dumps(
                       example_app_access_token_fail_resp_missing_client_secret
                   ),
@@ -143,7 +143,7 @@ def test_token_constructor_missing_client_secret_exception_thrown():
 @responses.activate
 def test_validate_valid_ret_true(token):
     responses.add(responses.GET,
-                  f'{BASE_OAUTH2_URL}/validate',
+                  f'{BASE_OAUTH2_URL}validate',
                   body=json.dumps(example_token_validation_pass_resp),
                   status=200,
                   content_type='application/json')
@@ -155,7 +155,7 @@ def test_validate_valid_ret_true(token):
 @responses.activate
 def test_validate_invalid_ret_false(token):
     responses.add(responses.GET,
-                  f'{BASE_OAUTH2_URL}/validate',
+                  f'{BASE_OAUTH2_URL}validate',
                   body=json.dumps(example_token_validation_fail_resp),
                   status=401,
                   content_type='application/json')
@@ -167,7 +167,7 @@ def test_validate_invalid_ret_false(token):
 @responses.activate
 def test_revoke_valid_token_pass(token):
     responses.add(responses.POST,
-                  f'{BASE_OAUTH2_URL}/revoke',
+                  f'{BASE_OAUTH2_URL}revoke',
                   status=200)
 
     token.revoke()
@@ -178,7 +178,7 @@ def test_revoke_valid_token_pass(token):
 def test_revoke_missing_token_throw_exception(token):
     token.token = None
     responses.add(responses.POST,
-                  f'{BASE_OAUTH2_URL}/revoke',
+                  f'{BASE_OAUTH2_URL}revoke',
                   body=json.dumps(
                       example_token_revoke_fail_resp_missing_token
                   ),
@@ -192,7 +192,7 @@ def test_revoke_missing_token_throw_exception(token):
 @responses.activate
 def test_revoke_invalid_token_fail(token):
     responses.add(responses.POST,
-                  f'{BASE_OAUTH2_URL}/revoke',
+                  f'{BASE_OAUTH2_URL}revoke',
                   body=json.dumps(
                       example_token_revoke_fail_resp_invalid_token
                   ),
