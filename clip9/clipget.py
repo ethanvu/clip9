@@ -36,8 +36,9 @@ class ClipGetter:
                             f'/recent_viewership_values')
 
         if (resp.status_code == 404):
-            logging.info(f"Couldn't find weekly viewer stats for {user_name}."
-                         f"Skipping getting clips for this user.")
+            logging.info(f"Couldn't find weekly viewer stats for "
+                         f"{user_name}.  Skipping getting clips for this "
+                         f"user.")
             return 0
         elif (resp.status_code >= 400):
             logging.error(f"Error when getting weekly viewer stats of "
@@ -75,7 +76,7 @@ class ClipGetter:
         good_clips = []
         avg_views = self._get_avg_viewers_in_past_week(user_id, user_name)
         if (avg_views == 0):
-            logging.info(f"{user_name} didn't stream since last week."
+            logging.info(f"{user_name} didn't stream since last week.  "
                          f"Skipping getting clips for {user_name}.")
             return good_clips
 
