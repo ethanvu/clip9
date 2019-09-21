@@ -104,6 +104,12 @@ example_embed_url_resp_no_video = """<!DOCTYPE html>
 </html>
 """
 
+class Element:
+    """Represents an HTML element.  This is for testing purposes."""
+
+    def __init__(self, attrs):
+        self.attrs = attrs
+
 
 @responses.activate
 def test__get_clip_src_url_valid_thumbnail_url_ret_src(mocker):
@@ -113,6 +119,26 @@ def test__get_clip_src_url_valid_thumbnail_url_ret_src(mocker):
                   status=200,
                   content_type='text/html')
     mocker.patch('requests_html.HTML.render')
+
+    splicer = ClipSplicer(example_clip_list)
+    src_url = splicer._get_clip_src_url(example_clip_list[0]['embed_url'])
+    assert ('https://clips-media-assets2.twitch.tv/AT-157589949-640x360.mp4'
+            == src_url)
+
+
+@responses.activate
+def test__get_clip_src_url_valid_url_with_retry_ret_src(mocker):
+    responses.add(responses.GET,
+                  example_clip_list[0]['embed_url'],
+                  body=example_embed_url_resp,
+                  status=200,
+                  content_type='text/html')
+    mocker.patch('requests_html.HTML.render')
+    attrs = {
+        'src': 'https://clips-media-assets2.twitch.tv/AT-157589949-640x360.mp4'
+    }
+    elem = Element(attrs=attrs)
+    mocker.patch('requests_html.HTML.xpath', side_effect=[None, elem])
 
     splicer = ClipSplicer(example_clip_list)
     src_url = splicer._get_clip_src_url(example_clip_list[0]['embed_url'])
@@ -131,7 +157,7 @@ def test__get_clip_src_url_elem_not_found_throws_exception(mocker):
     mocker.patch('requests_html.HTML.render')
 
     splicer = ClipSplicer(example_clip_list)
-    with pytest.raises(ValueError):
+    with pytest.raises(requests.HTTPError):
         splicer._get_clip_src_url(embed_url)
 
 
@@ -146,7 +172,7 @@ def test__get_clip_src_url_missing_src_throws_exception(mocker):
     mocker.patch('requests_html.HTML.render')
 
     splicer = ClipSplicer(example_clip_list)
-    with pytest.raises(ValueError):
+    with pytest.raises(requests.HTTPError):
         splicer._get_clip_src_url(embed_url)
 
 
@@ -177,10 +203,9 @@ def test__download_clip_valid_url_success(mocker):
     m = mocker.patch('builtins.open', mocker.mock_open())
 
     splicer = ClipSplicer(example_clip_list)
-    is_downloaded = splicer._download_clip(example_clip_list[0], path)
+    splicer._download_clip(example_clip_list[0], path)
     m.assert_called_with(f'{path}/{example_clip_list[0]["id"]}.mp4', 'wb')
     m().write.assert_called_once_with(b'a')
-    assert is_downloaded
 
 
 @responses.activate
@@ -196,8 +221,8 @@ def test__download_clip_invalid_url_throws_exception(mocker):
                   content_type='application/xml')
 
     splicer = ClipSplicer(example_clip_list)
-    is_downloaded = splicer._download_clip(example_clip_list[0], path)
-    assert not is_downloaded
+    with pytest.raises(requests.HTTPError):
+        splicer._download_clip(example_clip_list[0], path)
 
 
 @responses.activate
@@ -221,8 +246,7 @@ def test__download_clip_invalid_path_throws_exception(mocker):
 def test_splice_valid_clips_mp4_success(mocker):
     result_file_name = './result.mp4'
     clips_dir = 'tests/resources/'
-    mocker.patch('clipsplice.ClipSplicer._download_clip', return_value=True)
-    mocker.patch('clipsplice.ClipSplicer._download_clip', return_value=True)
+    mocker.patch('clipsplice.ClipSplicer._download_clip')
 
     splicer = ClipSplicer(example_clip_list)
     splicer.splice(result_file_name, clips_dir=clips_dir)
@@ -235,8 +259,7 @@ def test_splice_valid_clips_mp4_success(mocker):
 def test_splice_valid_clips_ogv_success(mocker):
     result_file_name = './result.ogv'
     clips_dir = 'tests/resources/'
-    mocker.patch('clipsplice.ClipSplicer._download_clip', return_value=True)
-    mocker.patch('clipsplice.ClipSplicer._download_clip', return_value=True)
+    mocker.patch('clipsplice.ClipSplicer._download_clip')
 
     splicer = ClipSplicer(example_clip_list)
     splicer.splice(result_file_name, clips_dir=clips_dir)
@@ -249,8 +272,7 @@ def test_splice_valid_clips_ogv_success(mocker):
 def test_splice_valid_clips_webm_success(mocker):
     result_file_name = './result.webm'
     clips_dir = 'tests/resources/'
-    mocker.patch('clipsplice.ClipSplicer._download_clip', return_value=True)
-    mocker.patch('clipsplice.ClipSplicer._download_clip', return_value=True)
+    mocker.patch('clipsplice.ClipSplicer._download_clip')
 
     splicer = ClipSplicer(example_clip_list)
     splicer.splice(result_file_name, clips_dir=clips_dir)
@@ -263,8 +285,7 @@ def test_splice_valid_clips_webm_success(mocker):
 def test_splice_valid_clips_avi_success(mocker):
     result_file_name = './result.avi'
     clips_dir = 'tests/resources/'
-    mocker.patch('clipsplice.ClipSplicer._download_clip', return_value=True)
-    mocker.patch('clipsplice.ClipSplicer._download_clip', return_value=True)
+    mocker.patch('clipsplice.ClipSplicer._download_clip')
 
     splicer = ClipSplicer(example_clip_list)
     splicer.splice(result_file_name, clips_dir=clips_dir)
@@ -275,8 +296,8 @@ def test_splice_valid_clips_avi_success(mocker):
 
 def test_splice_invalid_clips_no_result_file(mocker):
     result_file_name = './result.mp4'
-    mocker.patch('clipsplice.ClipSplicer._download_clip', return_value=False)
-    mocker.patch('clipsplice.ClipSplicer._download_clip', return_value=False)
+    mocker.patch('clipsplice.ClipSplicer._download_clip',
+                 side_effect=requests.HTTPError)
 
     splicer = ClipSplicer(example_clip_list)
     splicer.splice(result_file_name)
