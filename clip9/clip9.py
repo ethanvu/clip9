@@ -81,7 +81,7 @@ def _parse_credentials_cfg(cfg_file_name):
 
 def main():
     args = _parse_args()
-    logging.basicConfig(level=logging.DEBUG, filename=args.log_file, 
+    logging.basicConfig(level=logging.INFO, filename=args.log_file, 
                         format='[%(asctime)s]%(levelname)s: %(message)s')
     sys.excepthook = handle_exception
 
@@ -101,7 +101,7 @@ def main():
     users_list = team_users.users_list
     getter = ClipGetter(users_list, started_at=args.started_at,
                         ended_at=args.ended_at, lang=args.lang)
-    clips_list = clipgetter.get_clips(client_id, token.token)
+    clips_list = getter.get_clips(client_id, token.token)
     splicer = ClipSplicer(clips_list)
     splicer.splice(args.output_file, args.clips_dir)
     token.revoke()

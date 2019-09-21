@@ -39,6 +39,8 @@ class ClipSplicer():
 
         :param clip: Info of a clip recieved from the Twitch Helix API.
         :param path: Path to save the clip in.
+        :return: True if the clip was downloaded successfully, false
+                 if the HTTP GET to the clip source URL failed.
         """
         logging.info(f"Downloading clip {clip['id']}")
         clip_src_url = self._get_clip_src_url(clip['embed_url'])
@@ -46,14 +48,15 @@ class ClipSplicer():
         resp = requests.get(clip_src_url, stream=True)
 
         if (resp.status_code >= 400):
-            logging.error(f"Error when downloading clip {resp.status_code}")
-            resp.raise_for_status()
+            logging.warning(f"Error when downloading clip: {resp.status_code}")
+            return False
 
         with open(f'{path}/{clip["id"]}.mp4', 'wb') as f:
             for chunk in resp.iter_content(chunk_size=1024*1024):
                 if chunk:
                     f.write(chunk)
         logging.info(f"Downloaded {clip['id']}.mp4")
+        return True
 
 
     def splice(self, result_file_name, clips_dir='./'):
@@ -66,10 +69,16 @@ class ClipSplicer():
         """
         logging.info(f"Splicing {len(self.clips_list)} clips")
         file_list = []
+        fail_list = []
         for clip in self.clips_list:
-            self._download_clip(clip, clips_dir)
-            clip_file = VideoFileClip(f'{clips_dir}/{clip["id"]}.mp4')
-            file_list.append(clip_file)
+            is_downloaded = self._download_clip(clip, clips_dir)
+            if (is_downloaded):
+                clip_file = VideoFileClip(f'{clips_dir}/{clip["id"]}.mp4')
+                file_list.append(clip_file)
+            else:
+                fail_list.append(clip['id'])
+        if (fail_list):
+            logging.warning(f"Some clips couldn't be downloaded: {fail_list}")
 
         if (len(file_list) > 0):
             result = concatenate_videoclips(file_list)
