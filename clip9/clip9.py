@@ -7,6 +7,7 @@ from configparser import ConfigParser
 import logging
 import os
 import sys
+import time
 
 from clipget import ClipGetter
 from clipsplice import ClipSplicer
@@ -80,6 +81,7 @@ def _parse_credentials_cfg(cfg_file_name):
 
 
 def main():
+    start_time = time.time()
     args = _parse_args()
     logging.basicConfig(level=logging.INFO, filename=args.log_file, 
                         format='[%(asctime)s]%(levelname)s: %(message)s')
@@ -111,6 +113,8 @@ def main():
         raise e
     finally:
         token.revoke()
+        elapsed_time = time.time() - start_time
+        logging.info(f"Execution time: {elapsed_time} seconds")
 
 
 if __name__ == '__main__':
