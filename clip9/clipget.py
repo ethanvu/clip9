@@ -32,7 +32,7 @@ class ClipGetter:
     def _get_avg_viewers_in_past_week(self, user_id, user_name):
         """Return the average viewers of a user in the past week."""
         logging.info(f"Getting average view count for {user_name}")
-        resp = requests.get(f'{BASE_TWITCHMETRICS_URL}c/{user_id}-{user_name}'
+        resp = requests.get(f'{BASE_TWITCHMETRICS_URL}/c/{user_id}-{user_name}'
                             f'/recent_viewership_values')
 
         if (resp.status_code == 404):

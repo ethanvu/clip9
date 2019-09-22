@@ -74,7 +74,7 @@ example_team_fail_resp_invalid_client_id_and_token = {
 def test_get_valid_team_and_client_id_gets_users():
     team_name = 'staff'
     responses.add(responses.GET,
-                  f'{BASE_KRAKEN_URL}teams/{team_name}',
+                  f'{BASE_KRAKEN_URL}/teams/{team_name}',
                   body=json.dumps(example_team_pass_resp),
                   status=200,
                   content_type='application/json')
@@ -89,7 +89,7 @@ def test_get_valid_team_and_client_id_gets_users():
 def test_get_valid_team_and_oauth_token_gets_users():
     team_name = 'staff'
     responses.add(responses.GET,
-                  f'{BASE_KRAKEN_URL}teams/{team_name}',
+                  f'{BASE_KRAKEN_URL}/teams/{team_name}',
                   body=json.dumps(example_team_pass_resp),
                   status=200,
                   content_type='application/json')
@@ -104,7 +104,7 @@ def test_get_valid_team_and_oauth_token_gets_users():
 def test_get_valid_team_client_id_and_oauth_token_gets_users():
     team_name = 'staff'
     responses.add(responses.GET,
-                  f'{BASE_KRAKEN_URL}teams/{team_name}',
+                  f'{BASE_KRAKEN_URL}/teams/{team_name}',
                   body=json.dumps(example_team_pass_resp),
                   status=200,
                   content_type='application/json')
@@ -121,7 +121,7 @@ def test_get_valid_team_client_id_and_oauth_token_gets_users():
 def test_get_invalid_team_throws_exception():
     team_name = 'aaaaaa'
     responses.add(responses.GET,
-                  f'{BASE_KRAKEN_URL}teams/{team_name}',
+                  f'{BASE_KRAKEN_URL}/teams/{team_name}',
                   body=json.dumps(example_team_fail_resp_invalid_team),
                   status=404,
                   content_type='application/json')
@@ -142,7 +142,7 @@ def test_get_missing_team_throws_exception():
 def test_get_invalid_client_id_throws_exception():
     team_name = 'staff'
     responses.add(responses.GET,
-                  f'{BASE_KRAKEN_URL}teams/{team_name}',
+                  f'{BASE_KRAKEN_URL}/teams/{team_name}',
                   body=json.dumps(example_team_fail_resp_invalid_client_id),
                   status=400,
                   content_type='application/json')
@@ -156,7 +156,7 @@ def test_get_invalid_client_id_throws_exception():
 def test_get_invalid_client_id_valid_token_throws_exception():
     team_name = 'staff'
     responses.add(responses.GET,
-                  f'{BASE_KRAKEN_URL}teams/{team_name}',
+                  f'{BASE_KRAKEN_URL}/teams/{team_name}',
                   body=json.dumps(example_team_pass_resp),
                   status=200,
                   content_type='application/json')
@@ -173,7 +173,7 @@ def test_get_invalid_client_id_valid_token_throws_exception():
 def test_get_valid_client_id_invalid_token_gets_users():
     team_name = 'staff'
     responses.add(responses.GET,
-                  f'{BASE_KRAKEN_URL}teams/{team_name}',
+                  f'{BASE_KRAKEN_URL}/teams/{team_name}',
                   body=json.dumps(example_team_pass_resp),
                   status=200,
                   content_type='application/json')
@@ -190,7 +190,7 @@ def test_get_valid_client_id_invalid_token_gets_users():
 def test_get_invalid_token_throws_exception():
     team_name = 'staff'
     responses.add(responses.GET,
-                  f'{BASE_KRAKEN_URL}teams/{team_name}',
+                  f'{BASE_KRAKEN_URL}/teams/{team_name}',
                   body=json.dumps(example_team_fail_resp_missing_client_id),
                   status=400,
                   content_type='application/json')
@@ -204,7 +204,7 @@ def test_get_invalid_token_throws_exception():
 def test_get_invalid_client_id_and_token_throws_exception():
     team_name = 'staff'
     responses.add(responses.GET,
-                  f'{BASE_KRAKEN_URL}teams/{team_name}',
+                  f'{BASE_KRAKEN_URL}/teams/{team_name}',
                   body=json.dumps(example_team_fail_resp_invalid_client_id),
                   status=400,
                   content_type='application/json')
@@ -218,7 +218,7 @@ def test_get_invalid_client_id_and_token_throws_exception():
 def test_get_missing_client_id_and_token_throws_exception():
     team_name = 'staff'
     responses.add(responses.GET,
-                  f'{BASE_KRAKEN_URL}teams/{team_name}',
+                  f'{BASE_KRAKEN_URL}/teams/{team_name}',
                   body=json.dumps(example_team_fail_resp_missing_client_id),
                   status=400,
                   content_type='application/json')

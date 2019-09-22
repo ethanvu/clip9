@@ -174,7 +174,7 @@ example_clips_resp_invalid_started_or_ended_at = {
 @responses.activate
 def test__get_avg_viewers_in_past_week_user_exists_ret_avg():
     responses.add(responses.GET,
-                  f'{BASE_TWITCHMETRICS_URL}c/{example_users_list[0]["_id"]}-'
+                  f'{BASE_TWITCHMETRICS_URL}/c/{example_users_list[0]["_id"]}-'
                   f'{example_users_list[0]["name"]}/recent_viewership_values',
                   body=json.dumps(example_twitchmetrics_viewership_resp),
                   status=200,
@@ -189,7 +189,7 @@ def test__get_avg_viewers_in_past_week_user_exists_ret_avg():
 @responses.activate
 def test__get_avg_viewers_in_past_week_user_doesnt_exist_ret_0():
     responses.add(responses.GET,
-                  f'{BASE_TWITCHMETRICS_URL}c/{example_users_list[0]["_id"]}-'
+                  f'{BASE_TWITCHMETRICS_URL}/c/{example_users_list[0]["_id"]}-'
                   f'{example_users_list[0]["name"]}/recent_viewership_values',
                   body=example_twitchmetrics_viewership_resp_doesnt_exist,
                   status=404,
@@ -204,7 +204,7 @@ def test__get_avg_viewers_in_past_week_user_doesnt_exist_ret_0():
 @responses.activate
 def test__get_avg_viewers_in_past_week_user_didnt_stream_ret_0():
     responses.add(responses.GET,
-                  f'{BASE_TWITCHMETRICS_URL}c/{example_users_list[0]["_id"]}-'
+                  f'{BASE_TWITCHMETRICS_URL}/c/{example_users_list[0]["_id"]}-'
                   f'{example_users_list[0]["name"]}/recent_viewership_values',
                   body=json.dumps(example_twitchmetrics_viewership_resp_empty),
                   status=200,
@@ -219,7 +219,7 @@ def test__get_avg_viewers_in_past_week_user_didnt_stream_ret_0():
 @responses.activate
 def test__get_avg_viewers_in_past_week_user_didnt_stream_ret_0():
     responses.add(responses.GET,
-                  f'{BASE_TWITCHMETRICS_URL}c/{example_users_list[0]["_id"]}-'
+                  f'{BASE_TWITCHMETRICS_URL}/c/{example_users_list[0]["_id"]}-'
                   f'{example_users_list[0]["name"]}/recent_viewership_values',
                   status=404,
                   content_type='text/html')
@@ -231,9 +231,9 @@ def test__get_avg_viewers_in_past_week_user_didnt_stream_ret_0():
     
 
 @responses.activate
-def test__get_avg_viewers_in_past_week_got_gt_400_status_code_throws_exception():
+def test__get_avg_viewers_in_past_week_gt_400_status_code_throws_exception():
     responses.add(responses.GET,
-                  f'{BASE_TWITCHMETRICS_URL}c/{example_users_list[0]["_id"]}-'
+                  f'{BASE_TWITCHMETRICS_URL}/c/{example_users_list[0]["_id"]}-'
                   f'{example_users_list[0]["name"]}/recent_viewership_values',
                   status=400,
                   content_type='text/html')
@@ -259,13 +259,13 @@ def test__get_clip_rating_low_clip_views_high_avg_ret_lt_1():
 @responses.activate
 def test__get_good_clips_valid_client_id_ret_clips():
     responses.add(responses.GET,
-                  f'{BASE_TWITCHMETRICS_URL}c/{example_users_list[0]["_id"]}-'
+                  f'{BASE_TWITCHMETRICS_URL}/c/{example_users_list[0]["_id"]}-'
                   f'{example_users_list[0]["name"]}/recent_viewership_values',
                   body=json.dumps(example_twitchmetrics_viewership_resp),
                   status=200,
                   content_type='application/json')
     responses.add(responses.GET,
-                  f'{BASE_HELIX_URL}clips?'
+                  f'{BASE_HELIX_URL}/clips?'
                   f'broadcaster_id={example_users_list[0]["_id"]}',
                   body=json.dumps(example_clips_resp),
                   status=200,
@@ -282,13 +282,13 @@ def test__get_good_clips_valid_client_id_ret_clips():
 @responses.activate
 def test__get_good_clips_valid_oauth_token_ret_clips():
     responses.add(responses.GET,
-                  f'{BASE_TWITCHMETRICS_URL}c/{example_users_list[0]["_id"]}-'
+                  f'{BASE_TWITCHMETRICS_URL}/c/{example_users_list[0]["_id"]}-'
                   f'{example_users_list[0]["name"]}/recent_viewership_values',
                   body=json.dumps(example_twitchmetrics_viewership_resp),
                   status=200,
                   content_type='application/json')
     responses.add(responses.GET,
-                  f'{BASE_HELIX_URL}clips?'
+                  f'{BASE_HELIX_URL}/clips?'
                   f'broadcaster_id={example_users_list[0]["_id"]}',
                   body=json.dumps(example_clips_resp),
                   status=200,
@@ -305,7 +305,7 @@ def test__get_good_clips_valid_oauth_token_ret_clips():
 @responses.activate
 def test__get_good_clips_didnt_stream_ret_no_clips():
     responses.add(responses.GET,
-                  f'{BASE_TWITCHMETRICS_URL}c/{example_users_list[0]["_id"]}-'
+                  f'{BASE_TWITCHMETRICS_URL}/c/{example_users_list[0]["_id"]}-'
                   f'{example_users_list[0]["name"]}/recent_viewership_values',
                   body=json.dumps(example_twitchmetrics_viewership_resp_empty),
                   status=200,
@@ -321,13 +321,13 @@ def test__get_good_clips_didnt_stream_ret_no_clips():
 @responses.activate
 def test__get_good_clips_no_clips_ret_no_clips():
     responses.add(responses.GET,
-                  f'{BASE_TWITCHMETRICS_URL}c/{example_users_list[0]["_id"]}-'
+                  f'{BASE_TWITCHMETRICS_URL}/c/{example_users_list[0]["_id"]}-'
                   f'{example_users_list[0]["name"]}/recent_viewership_values',
                   body=json.dumps(example_twitchmetrics_viewership_resp),
                   status=200,
                   content_type='application/json')
     responses.add(responses.GET,
-                  f'{BASE_HELIX_URL}clips?'
+                  f'{BASE_HELIX_URL}/clips?'
                   f'broadcaster_id={example_users_list[0]["_id"]}',
                   body=json.dumps(example_clips_resp_no_clips),
                   status=200,
@@ -343,13 +343,13 @@ def test__get_good_clips_no_clips_ret_no_clips():
 @responses.activate
 def test__get_good_clips_invalid_client_id_and_token_throw_exception():
     responses.add(responses.GET,
-                  f'{BASE_TWITCHMETRICS_URL}c/{example_users_list[0]["_id"]}-'
+                  f'{BASE_TWITCHMETRICS_URL}/c/{example_users_list[0]["_id"]}-'
                   f'{example_users_list[0]["name"]}/recent_viewership_values',
                   body=json.dumps(example_twitchmetrics_viewership_resp),
                   status=200,
                   content_type='application/json')
     responses.add(responses.GET,
-                  f'{BASE_HELIX_URL}clips?'
+                  f'{BASE_HELIX_URL}/clips?'
                   f'broadcaster_id={example_users_list[0]["_id"]}',
                   body=json.dumps(example_clips_resp_invalid_client_id_and_token),
                   status=401,
@@ -365,13 +365,13 @@ def test__get_good_clips_invalid_client_id_and_token_throw_exception():
 def test__get_good_clips_valid_started_at_ret_clips():
     started_at = '2019-08-19T00:00:00Z'
     responses.add(responses.GET,
-                  f'{BASE_TWITCHMETRICS_URL}c/{example_users_list[0]["_id"]}-'
+                  f'{BASE_TWITCHMETRICS_URL}/c/{example_users_list[0]["_id"]}-'
                   f'{example_users_list[0]["name"]}/recent_viewership_values',
                   body=json.dumps(example_twitchmetrics_viewership_resp),
                   status=200,
                   content_type='application/json')
     responses.add(responses.GET,
-                  f'{BASE_HELIX_URL}clips?'
+                  f'{BASE_HELIX_URL}/clips?'
                   f'broadcaster_id={example_users_list[0]["_id"]}'
                   f'&started_at={started_at}',
                   body=json.dumps(example_clips_resp),
@@ -390,13 +390,13 @@ def test__get_good_clips_valid_started_at_ret_clips():
 def test__get_good_clips_valid_ended_at_ret_clips():
     ended_at = '2019-08-18T00:00:00Z'
     responses.add(responses.GET,
-                  f'{BASE_TWITCHMETRICS_URL}c/{example_users_list[0]["_id"]}-'
+                  f'{BASE_TWITCHMETRICS_URL}/c/{example_users_list[0]["_id"]}-'
                   f'{example_users_list[0]["name"]}/recent_viewership_values',
                   body=json.dumps(example_twitchmetrics_viewership_resp),
                   status=200,
                   content_type='application/json')
     responses.add(responses.GET,
-                  f'{BASE_HELIX_URL}clips?'
+                  f'{BASE_HELIX_URL}/clips?'
                   f'broadcaster_id={example_users_list[0]["_id"]}'
                   f'&ended_at={ended_at}',
                   body=json.dumps(example_clips_resp),
@@ -416,13 +416,13 @@ def test__get_good_clips_valid_started_and_ended_at_ret_clips():
     started_at = '2019-08-19T00:00:00Z'
     ended_at = '2019-08-21T00:00:00Z'
     responses.add(responses.GET,
-                  f'{BASE_TWITCHMETRICS_URL}c/{example_users_list[0]["_id"]}-'
+                  f'{BASE_TWITCHMETRICS_URL}/c/{example_users_list[0]["_id"]}-'
                   f'{example_users_list[0]["name"]}/recent_viewership_values',
                   body=json.dumps(example_twitchmetrics_viewership_resp),
                   status=200,
                   content_type='application/json')
     responses.add(responses.GET,
-                  f'{BASE_HELIX_URL}clips?'
+                  f'{BASE_HELIX_URL}/clips?'
                   f'broadcaster_id={example_users_list[0]["_id"]}'
                   f'&started_at={started_at}'
                   f'&ended_at={ended_at}',
@@ -443,13 +443,13 @@ def test__get_good_clips_valid_started_and_ended_at_ret_clips():
 def test__get_good_clips_invalid_started_at_throw_exception():
     started_at = 'a'
     responses.add(responses.GET,
-                  f'{BASE_TWITCHMETRICS_URL}c/{example_users_list[0]["_id"]}-'
+                  f'{BASE_TWITCHMETRICS_URL}/c/{example_users_list[0]["_id"]}-'
                   f'{example_users_list[0]["name"]}/recent_viewership_values',
                   body=json.dumps(example_twitchmetrics_viewership_resp),
                   status=200,
                   content_type='application/json')
     responses.add(responses.GET,
-                  f'{BASE_HELIX_URL}clips?'
+                  f'{BASE_HELIX_URL}/clips?'
                   f'broadcaster_id={example_users_list[0]["_id"]}'
                   f'&started_at={started_at}',
                   body=json.dumps(
@@ -469,13 +469,13 @@ def test__get_good_clips_invalid_started_at_throw_exception():
 def test__get_good_clips_invalid_ended_at_throw_exception():
     ended_at = 'a'
     responses.add(responses.GET,
-                  f'{BASE_TWITCHMETRICS_URL}c/{example_users_list[0]["_id"]}-'
+                  f'{BASE_TWITCHMETRICS_URL}/c/{example_users_list[0]["_id"]}-'
                   f'{example_users_list[0]["name"]}/recent_viewership_values',
                   body=json.dumps(example_twitchmetrics_viewership_resp),
                   status=200,
                   content_type='application/json')
     responses.add(responses.GET,
-                  f'{BASE_HELIX_URL}clips?'
+                  f'{BASE_HELIX_URL}/clips?'
                   f'broadcaster_id={example_users_list[0]["_id"]}'
                   f'&ended_at={ended_at}',
                   body=json.dumps(
@@ -494,25 +494,25 @@ def test__get_good_clips_invalid_ended_at_throw_exception():
 @responses.activate
 def test_get_clips_all_lang_valid_client_id_ret_clips():
     responses.add(responses.GET,
-                  f'{BASE_TWITCHMETRICS_URL}c/{example_users_list[0]["_id"]}-'
+                  f'{BASE_TWITCHMETRICS_URL}/c/{example_users_list[0]["_id"]}-'
                   f'{example_users_list[0]["name"]}/recent_viewership_values',
                   body=json.dumps(example_twitchmetrics_viewership_resp),
                   status=200,
                   content_type='application/json')
     responses.add(responses.GET,
-                  f'{BASE_HELIX_URL}clips?'
+                  f'{BASE_HELIX_URL}/clips?'
                   f'broadcaster_id={example_users_list[0]["_id"]}',
                   body=json.dumps(example_clips_resp),
                   status=200,
                   content_type='application/json')
     responses.add(responses.GET,
-                  f'{BASE_TWITCHMETRICS_URL}c/{example_users_list[1]["_id"]}-'
+                  f'{BASE_TWITCHMETRICS_URL}/c/{example_users_list[1]["_id"]}-'
                   f'{example_users_list[1]["name"]}/recent_viewership_values',
                   body=json.dumps(example_twitchmetrics_viewership_resp),
                   status=200,
                   content_type='application/json')
     responses.add(responses.GET,
-                  f'{BASE_HELIX_URL}clips?'
+                  f'{BASE_HELIX_URL}/clips?'
                   f'broadcaster_id={example_users_list[1]["_id"]}',
                   body=json.dumps(example_clips_resp2),
                   status=200,
@@ -528,25 +528,25 @@ def test_get_clips_all_lang_valid_client_id_ret_clips():
 @responses.activate
 def test_get_clips_all_lang_valid_token_ret_clips():
     responses.add(responses.GET,
-                  f'{BASE_TWITCHMETRICS_URL}c/{example_users_list[0]["_id"]}-'
+                  f'{BASE_TWITCHMETRICS_URL}/c/{example_users_list[0]["_id"]}-'
                   f'{example_users_list[0]["name"]}/recent_viewership_values',
                   body=json.dumps(example_twitchmetrics_viewership_resp),
                   status=200,
                   content_type='application/json')
     responses.add(responses.GET,
-                  f'{BASE_HELIX_URL}clips?'
+                  f'{BASE_HELIX_URL}/clips?'
                   f'broadcaster_id={example_users_list[0]["_id"]}',
                   body=json.dumps(example_clips_resp),
                   status=200,
                   content_type='application/json')
     responses.add(responses.GET,
-                  f'{BASE_TWITCHMETRICS_URL}c/{example_users_list[1]["_id"]}-'
+                  f'{BASE_TWITCHMETRICS_URL}/c/{example_users_list[1]["_id"]}-'
                   f'{example_users_list[1]["name"]}/recent_viewership_values',
                   body=json.dumps(example_twitchmetrics_viewership_resp),
                   status=200,
                   content_type='application/json')
     responses.add(responses.GET,
-                  f'{BASE_HELIX_URL}clips?'
+                  f'{BASE_HELIX_URL}/clips?'
                   f'broadcaster_id={example_users_list[1]["_id"]}',
                   body=json.dumps(example_clips_resp2),
                   status=200,
@@ -562,13 +562,13 @@ def test_get_clips_all_lang_valid_token_ret_clips():
 @responses.activate
 def test_get_clips_invalid_client_id_and_token_throws_exception():
     responses.add(responses.GET,
-                  f'{BASE_TWITCHMETRICS_URL}c/{example_users_list[0]["_id"]}-'
+                  f'{BASE_TWITCHMETRICS_URL}/c/{example_users_list[0]["_id"]}-'
                   f'{example_users_list[0]["name"]}/recent_viewership_values',
                   body=json.dumps(example_twitchmetrics_viewership_resp),
                   status=200,
                   content_type='application/json')
     responses.add(responses.GET,
-                  f'{BASE_HELIX_URL}clips?'
+                  f'{BASE_HELIX_URL}/clips?'
                   f'broadcaster_id={example_users_list[0]["_id"]}',
                   body=json.dumps(
                       example_clips_resp_invalid_client_id_and_token
@@ -584,13 +584,13 @@ def test_get_clips_invalid_client_id_and_token_throws_exception():
 @responses.activate
 def test_get_clips_lang_en_ret_less_clips():
     responses.add(responses.GET,
-                  f'{BASE_TWITCHMETRICS_URL}c/{example_users_list[0]["_id"]}-'
+                  f'{BASE_TWITCHMETRICS_URL}/c/{example_users_list[0]["_id"]}-'
                   f'{example_users_list[0]["name"]}/recent_viewership_values',
                   body=json.dumps(example_twitchmetrics_viewership_resp),
                   status=200,
                   content_type='application/json')
     responses.add(responses.GET,
-                  f'{BASE_HELIX_URL}clips?'
+                  f'{BASE_HELIX_URL}/clips?'
                   f'broadcaster_id={example_users_list[0]["_id"]}',
                   body=json.dumps(example_clips_resp),
                   status=200,

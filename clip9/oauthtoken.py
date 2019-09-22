@@ -31,7 +31,7 @@ class OauthToken:
             'grant_type': 'client_credentials',
         }
 
-        resp = requests.post(f'{BASE_OAUTH2_URL}token',
+        resp = requests.post(f'{BASE_OAUTH2_URL}/token',
                              data=app_access_tok_params)
         resp_json = resp.json()
 
@@ -49,7 +49,7 @@ class OauthToken:
         logging.info(f"Validating token {self.token}")
         validation_headers = {'Authorization': f'OAuth {self.token}'}
 
-        resp = requests.get(f'{BASE_OAUTH2_URL}validate',
+        resp = requests.get(f'{BASE_OAUTH2_URL}/validate',
                             headers=validation_headers)
 
         is_valid = resp.status_code == 200
@@ -65,7 +65,7 @@ class OauthToken:
             'token': self.token,
         }
 
-        resp = requests.post(f'{BASE_OAUTH2_URL}revoke',
+        resp = requests.post(f'{BASE_OAUTH2_URL}/revoke',
                              data=revoke_params)
 
         if (resp.status_code >= 400):
