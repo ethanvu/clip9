@@ -15,7 +15,7 @@ from teamusers import TeamUsers
 
 
 def handle_exception(type, value, traceback):
-    logging.error(f"Uncaught exception", exc_info=(type, value, traceback))
+    logging.error(f"Exception", exc_info=(type, value, traceback))
 
 
 def _parse_args():
@@ -96,15 +96,21 @@ def main():
     if (not token.validate()):
         logging.error("Token isn't valid")
         exit(1)
-    team_users = TeamUsers()
-    team_users.get(args.team, client_id=client_id, oauth_token=token.token)
-    users_list = team_users.users_list
-    getter = ClipGetter(users_list, started_at=args.started_at,
-                        ended_at=args.ended_at, lang=args.lang)
-    clips_list = getter.get_clips(client_id, token.token)
-    splicer = ClipSplicer(clips_list)
-    splicer.splice(args.output_file, args.clips_dir)
-    token.revoke()
+    try:
+        team_users = TeamUsers()
+        team_users.get(args.team, client_id=client_id, oauth_token=token.token)
+        users_list = team_users.users_list
+        getter = ClipGetter(users_list, started_at=args.started_at,
+                            ended_at=args.ended_at, lang=args.lang)
+        clips_list = getter.get_clips(client_id, token.token)
+        splicer = ClipSplicer(clips_list)
+        splicer.splice(args.output_file, args.clips_dir)
+        logging.info("Successfully generated a video of good clips")
+    except Exception as e:
+        logging.error("There was an exception during execution")
+        raise e
+    finally:
+        token.revoke()
 
 
 if __name__ == '__main__':
