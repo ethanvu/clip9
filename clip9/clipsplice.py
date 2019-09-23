@@ -38,6 +38,7 @@ class ClipSplicer():
             elem = resp.html.xpath('/html/body/div[1]/div[1]/video',
                                    first=True)
             i += 1
+        session.close()
 
         if (elem is None):
             raise requests.HTTPError(f"Couldn't find video element after "
@@ -46,8 +47,8 @@ class ClipSplicer():
             raise requests.HTTPError(f"Couldn't find src attribute in video "
                                      f"element after rendering {embed_url}.")
 
-        logging.info(f"Found video src {elem.attrs['src']}")
         logging.debug(f"Attributes: {elem.attrs}")
+        logging.info(f"Found video src {elem.attrs['src']}")
         return elem.attrs['src']
 
 
@@ -60,7 +61,6 @@ class ClipSplicer():
         """
         logging.info(f"Downloading clip {clip['id']}")
         clip_src_url = self._get_clip_src_url(clip['embed_url'])
-        logging.info(f"Clip source URL: {clip_src_url}")
         resp = requests.get(clip_src_url, stream=True)
 
         if (resp.status_code >= 400):
