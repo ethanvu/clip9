@@ -3,6 +3,7 @@
 import logging
 
 from moviepy.editor import concatenate_videoclips, VideoFileClip
+import pyppeteer
 import requests
 from requests_html import HTMLSession
 
@@ -30,11 +31,35 @@ class ClipSplicer():
         if (resp.status_code >= 400):
             resp.raise_for_status()
 
+        script = """
+            () => {
+                var controls = document.getElementsByClassName(
+                        "pl-controls-bottom")[0];
+                controls.click();
+                var settings = document.getElementsByClassName(
+                        "qa-settings-button")[0];
+                settings.click();
+                var quality = document.getElementsByClassName(
+                        "qa-quality-button")[0];
+                quality.click();
+                var qualities = document.getElementsByClassName(
+                        "pl-quality-option-button");
+                var highest_quality = qualities[qualities.length - 1];
+                highest_quality.click();
+            }
+        """
         i = 1
         elem = None
         while ((i <= 3) and ((elem is None) or ('src' not in elem.attrs))):
             logging.info(f"Rendering {embed_url}: try {i}")
-            resp.html.render(sleep=i)
+            try:
+                resp.html.render(script=script, sleep=i)
+            except pyppeteer.errors.ElementHandleError as e:
+                logging.exception(f"Error when executing JavaScript to "
+                                  f"find video source URL on {embed_url}: {e}")
+                elem = None
+                i += 1
+                continue
             elem = resp.html.xpath('/html/body/div[1]/div[1]/video',
                                    first=True)
             i += 1
@@ -64,7 +89,7 @@ class ClipSplicer():
         resp = requests.get(clip_src_url, stream=True)
 
         if (resp.status_code >= 400):
-            logging.warning(f"Error when downloading clip: {resp.status_code}")
+            logging.error(f"Error when downloading clip: {resp.status_code}")
             resp.raise_for_status()
 
         with open(f'{path}/{clip["id"]}.mp4', 'wb') as f:
@@ -88,10 +113,11 @@ class ClipSplicer():
         for clip in self.clips_list:
             try:
                 self._download_clip(clip, clips_dir)
-                clip_file = VideoFileClip(f'{clips_dir}/{clip["id"]}.mp4')
+                clip_file = VideoFileClip(f'{clips_dir}/{clip["id"]}.mp4',
+                                          target_resolution=(1080, 1920))
                 file_list.append(clip_file)
             except requests.HTTPError as e:
-                logging.error
+                logging.exception(f"HTTPError when downloading {clip['id']}")
                 fail_list.append(clip['id'])
         if (fail_list):
             logging.warning(f"Some clips couldn't be downloaded: {fail_list}")

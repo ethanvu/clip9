@@ -3,6 +3,7 @@
 from pathlib import Path
 from unittest.mock import patch, mock_open
 
+import pyppeteer
 import pytest
 from pytest_mock import mocker
 import requests
@@ -68,7 +69,7 @@ example_embed_url_resp = """<!DOCTYPE html>
 <body style="margin: 0">
     <div class="player" id="video-playback">
         <div class="player-video">
-            <video autoplay="" preload="auto" webkit-playsinline="" playsinline="" src="https://clips-media-assets2.twitch.tv/AT-157589949-640x360.mp4"></video>
+            <video autoplay="" preload="auto" webkit-playsinline="" playsinline="" src="https://clips-media-assets2.twitch.tv/157589949.mp4"></video>
         </div>
     </div>
 </body>
@@ -122,8 +123,7 @@ def test__get_clip_src_url_valid_thumbnail_url_ret_src(mocker):
 
     splicer = ClipSplicer(example_clip_list)
     src_url = splicer._get_clip_src_url(example_clip_list[0]['embed_url'])
-    assert ('https://clips-media-assets2.twitch.tv/AT-157589949-640x360.mp4'
-            == src_url)
+    assert 'https://clips-media-assets2.twitch.tv/157589949.mp4' == src_url
 
 
 @responses.activate
@@ -135,15 +135,14 @@ def test__get_clip_src_url_valid_url_with_retry_ret_src(mocker):
                   content_type='text/html')
     mocker.patch('requests_html.HTML.render')
     attrs = {
-        'src': 'https://clips-media-assets2.twitch.tv/AT-157589949-640x360.mp4'
+        'src': 'https://clips-media-assets2.twitch.tv/157589949.mp4'
     }
     elem = Element(attrs=attrs)
     mocker.patch('requests_html.HTML.xpath', side_effect=[None, elem])
 
     splicer = ClipSplicer(example_clip_list)
     src_url = splicer._get_clip_src_url(example_clip_list[0]['embed_url'])
-    assert ('https://clips-media-assets2.twitch.tv/AT-157589949-640x360.mp4'
-            == src_url)
+    assert 'https://clips-media-assets2.twitch.tv/157589949.mp4' == src_url
 
 
 @responses.activate
@@ -154,7 +153,8 @@ def test__get_clip_src_url_elem_not_found_throws_exception(mocker):
                   body=example_embed_url_resp_no_src,
                   status=200,
                   content_type='text/html')
-    mocker.patch('requests_html.HTML.render')
+    mocker.patch('requests_html.HTML.render',
+                 side_effect=pyppeteer.errors.ElementHandleError)
 
     splicer = ClipSplicer(example_clip_list)
     with pytest.raises(requests.HTTPError):
@@ -191,7 +191,7 @@ def test__get_clip_src_url_failed_connection_throws_exception(mocker):
 
 @responses.activate
 def test__download_clip_valid_url_success(mocker):
-    src_url = 'https://clips-media-assets2.twitch.tv/AT-157589949-640x360.mp4'
+    src_url = 'https://clips-media-assets2.twitch.tv/157589949.mp4'
     path = './'
     mocker.patch('clipsplice.ClipSplicer._get_clip_src_url',
                  return_value=src_url)
@@ -210,7 +210,7 @@ def test__download_clip_valid_url_success(mocker):
 
 @responses.activate
 def test__download_clip_invalid_url_throws_exception(mocker):
-    src_url = 'https://clips-media-assets2.twitch.tv/AT-157589949-640x360.mp4'
+    src_url = 'https://clips-media-assets2.twitch.tv/157589949.mp4'
     path = './'
     mocker.patch('clipsplice.ClipSplicer._get_clip_src_url',
                  return_value=src_url)
@@ -227,7 +227,7 @@ def test__download_clip_invalid_url_throws_exception(mocker):
 
 @responses.activate
 def test__download_clip_invalid_path_throws_exception(mocker):
-    src_url = 'https://clips-media-assets2.twitch.tv/AT-157589949-640x360.mp4'
+    src_url = 'https://clips-media-assets2.twitch.tv/157589949.mp4'
     path = '/badpath/'
     mocker.patch('clipsplice.ClipSplicer._get_clip_src_url',
                  return_value=src_url)
