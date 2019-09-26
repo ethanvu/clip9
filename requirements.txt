@@ -33,7 +33,7 @@ pytest-cov==2.7.1
 pytest-mock==1.10.4
 python-twitch-client==0.6.0
 requests==2.22.0
--e git+https://github.com/ethanvu/requests-html.git@79974f46df19427631364b69f3e96435f725e704#egg=requests_html_evu
+-e git+https://github.com/ethanvu/requests-html.git@95397adfbd4152ed5e3c179aacff72976a2f1c3d#egg=requests_html_evu
 responses==0.10.6
 six==1.12.0
 soupsieve==1.9.3
