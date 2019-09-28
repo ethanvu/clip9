@@ -80,7 +80,7 @@ def test_token_constructor_valid_client_id_and_secret_pass(token):
                   body=json.dumps(example_app_access_token_pass_resp),
                   status=200,
                   content_type='application/json')
-    
+
     assert example_app_access_token == token.token
 
 
@@ -109,7 +109,7 @@ def test_token_constructor_invalid_client_secret_exception_thrown():
                   content_type='application/json')
 
     with pytest.raises(requests.HTTPError):
-        token = OauthToken(example_client_id, 'a')
+        OauthToken(example_client_id, 'a')
 
 
 @responses.activate
@@ -123,7 +123,7 @@ def test_token_constructor_missing_client_id_exception_thrown():
                   content_type='application/json')
 
     with pytest.raises(requests.HTTPError):
-        token = OauthToken(None, example_client_secret)
+        OauthToken(None, example_client_secret)
 
 
 @responses.activate
@@ -137,7 +137,7 @@ def test_token_constructor_missing_client_secret_exception_thrown():
                   content_type='application/json')
 
     with pytest.raises(requests.HTTPError):
-        token = OauthToken(example_client_id, None)
+        OauthToken(example_client_id, None)
 
 
 @responses.activate

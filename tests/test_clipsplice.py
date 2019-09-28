@@ -114,6 +114,7 @@ class Element:
 
 @responses.activate
 def test__get_clip_src_url_valid_thumbnail_url_ret_src(mocker):
+    expected_url = 'https://clips-media-assets2.twitch.tv/157589949.mp4'
     responses.add(responses.GET,
                   example_clip_list[0]['embed_url'],
                   body=example_embed_url_resp,
@@ -123,11 +124,12 @@ def test__get_clip_src_url_valid_thumbnail_url_ret_src(mocker):
 
     splicer = ClipSplicer(example_clip_list)
     src_url = splicer._get_clip_src_url(example_clip_list[0]['embed_url'])
-    assert 'https://clips-media-assets2.twitch.tv/157589949.mp4' == src_url
+    assert expected_url == src_url
 
 
 @responses.activate
 def test__get_clip_src_url_valid_url_with_retry_ret_src(mocker):
+    expected_url = 'https://clips-media-assets2.twitch.tv/157589949.mp4'
     responses.add(responses.GET,
                   example_clip_list[0]['embed_url'],
                   body=example_embed_url_resp,
@@ -142,7 +144,7 @@ def test__get_clip_src_url_valid_url_with_retry_ret_src(mocker):
 
     splicer = ClipSplicer(example_clip_list)
     src_url = splicer._get_clip_src_url(example_clip_list[0]['embed_url'])
-    assert 'https://clips-media-assets2.twitch.tv/157589949.mp4' == src_url
+    assert expected_url == src_url
 
 
 @responses.activate
@@ -178,7 +180,6 @@ def test__get_clip_src_url_missing_src_throws_exception(mocker):
 
 @responses.activate
 def test__get_clip_src_url_failed_connection_throws_exception(mocker):
-    embed_url = 'https://clips.twitch.tv/embed?clip=a'
     responses.add(responses.GET,
                   example_clip_list[0]['embed_url'],
                   status=400)

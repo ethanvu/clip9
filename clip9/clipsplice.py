@@ -24,11 +24,11 @@ class ClipSplicer():
                   the clip.
         :raises requests.HTTPError: When the source URL can't be found.
         """
-        logging.info(f"Getting clip source URL from {embed_url}")
+        logging.info("Getting clip source URL from %s", embed_url)
         session = HTMLSession()
         resp = session.get(embed_url)
 
-        if (resp.status_code >= 400):
+        if resp.status_code >= 400:
             resp.raise_for_status()
 
         script = """
@@ -51,12 +51,12 @@ class ClipSplicer():
         i = 1
         elem = None
         while ((i <= 3) and ((elem is None) or ('src' not in elem.attrs))):
-            logging.info(f"Rendering {embed_url}: try {i}")
+            logging.info("Rendering %s: try %i", embed_url, i)
             try:
                 resp.html.render(script=script, sleep=i)
             except pyppeteer.errors.ElementHandleError as e:
-                logging.exception(f"Error when executing JavaScript to "
-                                  f"find video source URL on {embed_url}: {e}")
+                logging.exception("Error when executing JavaScript to find "
+                                  "video source URL on %s: %s", embed_url, e)
                 elem = None
                 i += 1
                 continue
@@ -65,15 +65,15 @@ class ClipSplicer():
             i += 1
         session.close()
 
-        if (elem is None):
+        if elem is None:
             raise requests.HTTPError(f"Couldn't find video element after "
                                      f"rendering {embed_url}")
-        elif ('src' not in elem.attrs):
+        if 'src' not in elem.attrs:
             raise requests.HTTPError(f"Couldn't find src attribute in video "
                                      f"element after rendering {embed_url}.")
 
-        logging.debug(f"Attributes: {elem.attrs}")
-        logging.info(f"Found video src {elem.attrs['src']}")
+        logging.debug("Attributes: %s", elem.attrs)
+        logging.info("Found video src %s", elem.attrs['src'])
         return elem.attrs['src']
 
 
@@ -84,19 +84,19 @@ class ClipSplicer():
         :param path: Path to save the clip in.
         :raises requests.HTTPError: When there is an error when downloading.
         """
-        logging.info(f"Downloading clip {clip['id']}")
+        logging.info("Downloading clip %s", clip['id'])
         clip_src_url = self._get_clip_src_url(clip['embed_url'])
         resp = requests.get(clip_src_url, stream=True)
 
-        if (resp.status_code >= 400):
-            logging.error(f"Error when downloading clip: {resp.status_code}")
+        if resp.status_code >= 400:
+            logging.error("Error when downloading clip: %s", resp.status_code)
             resp.raise_for_status()
 
         with open(f'{path}/{clip["id"]}.mp4', 'wb') as f:
             for chunk in resp.iter_content(chunk_size=1024*1024):
                 if chunk:
                     f.write(chunk)
-        logging.info(f"Downloaded {clip['id']}.mp4")
+        logging.info("Downloaded %s.mp4", clip['id'])
 
 
     def splice(self, result_file_name, clips_dir='./'):
@@ -107,7 +107,7 @@ class ClipSplicer():
                                  e.g. ./result.mp4 or /var/tmp/final.avi
         :param clips_dir: Directory path to save the clip files in.
         """
-        logging.info(f"Splicing {len(self.clips_list)} clips")
+        logging.info("Splicing %s clips", len(self.clips_list))
         file_list = []
         fail_list = []
         for clip in self.clips_list:
@@ -116,16 +116,16 @@ class ClipSplicer():
                 clip_file = VideoFileClip(f'{clips_dir}/{clip["id"]}.mp4',
                                           target_resolution=(1080, 1920))
                 file_list.append(clip_file)
-            except requests.HTTPError as e:
-                logging.exception(f"HTTPError when downloading {clip['id']}")
+            except requests.HTTPError:
+                logging.exception("HTTPError when downloading %s", clip['id'])
                 fail_list.append(clip['id'])
-        if (fail_list):
-            logging.warning(f"Some clips couldn't be downloaded: {fail_list}")
+        if fail_list:
+            logging.warning("Some clips couldn't be downloaded: %s", fail_list)
 
-        if (len(file_list) > 0):
+        if len(file_list) > 0:
             result = concatenate_videoclips(file_list)
-            logging.info(f"Writing {result_file_name}")
-            if (result_file_name[-4:] == '.avi'):
+            logging.info("Writing %s", result_file_name)
+            if result_file_name[-4:] == '.avi':
                 result.write_videofile(f'{result_file_name}', codec='png')
             else:
                 result.write_videofile(f'{result_file_name}')

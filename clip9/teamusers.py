@@ -24,10 +24,10 @@ class TeamUsers(Users):
                                     communicating with the Twitch
                                     Kraken API.
         """
-        logging.info(f"Getting users from team {args[0]}")
+        logging.info("Getting users from team %s", args[0])
         if args[0] is None:
             raise TypeError
         client = TwitchClient(client_id=client_id, oauth_token=oauth_token)
         team = client.teams.get(args[0])
-        logging.info(f"Got {len(team.users)} users")
+        logging.info("Got %s users", len(team.users))
         self.users_list = team.users

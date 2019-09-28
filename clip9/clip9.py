@@ -15,8 +15,9 @@ from oauthtoken import OauthToken
 from teamusers import TeamUsers
 
 
-def handle_exception(type, value, traceback):
-    logging.error(f"Exception", exc_info=(type, value, traceback))
+def handle_exception(ex_type, value, traceback):
+    """Captures all uncaught exception for logging."""
+    logging.error("Exception", exc_info=(ex_type, value, traceback))
 
 
 def _parse_args():
@@ -51,43 +52,44 @@ def _parse_args():
                         action='store',
                         help="Name of the log file.")
     args = parser.parse_args()
-    if (args.clips_dir is None):
+    if args.clips_dir is None:
         args.clips_dir = './'
     return args
 
 
 def _parse_credentials_cfg(cfg_file_name):
-    logging.info(f'Loading {cfg_file_name}')
-    if (not os.path.isfile(cfg_file_name)):
-        logging.error(f"{cfg_file_name} doesn't exist")
-        exit(1)
+    logging.info('Loading %s', cfg_file_name)
+    if not os.path.isfile(cfg_file_name):
+        logging.error("%s doesn't exist", cfg_file_name)
+        sys.exit(1)
 
     config = ConfigParser()
     config.read(cfg_file_name)
-    logging.info(f'Loaded {cfg_file_name}')
+    logging.info("Loaded %s", cfg_file_name)
     credentials = config['credentials']
 
-    if ('TWITCH_CLIENT_ID' not in credentials):
+    if 'TWITCH_CLIENT_ID' not in credentials:
         logging.error("credentials.cfg does not contain TWITCH_CLIENT_ID")
-        exit(1)
+        sys.exit(1)
     logging.info("Loaded TWITCH_CLIENT_ID")
 
-    if ('TWITCH_CLIENT_SECRET' not in credentials):
+    if 'TWITCH_CLIENT_SECRET' not in credentials:
         logging.error("credentials.cfg does not contain TWITCH_CLIENT_SECRET")
-        exit(1)
+        sys.exit(1)
     logging.info("Loaded TWITCH_CLIENT_SECRET")
 
     return credentials
 
 
 def main():
+    """Executes the Clip9 main script."""
     start_time = time.time()
     args = _parse_args()
-    logging.basicConfig(level=logging.INFO, filename=args.log_file, 
+    logging.basicConfig(level=logging.INFO, filename=args.log_file,
                         format='[%(asctime)s]%(levelname)s: %(message)s')
     sys.excepthook = handle_exception
 
-    logging.info("-------STARTING CLIP9 MAIN SCRIPT-------")
+    logging.info("-------STARTING CLIP9-------")
 
     cfg_file_name = f'{os.path.dirname(sys.argv[0])}/../credentials.cfg'
     credentials = _parse_credentials_cfg(cfg_file_name)
@@ -95,9 +97,9 @@ def main():
     client_secret = credentials['TWITCH_CLIENT_SECRET']
 
     token = OauthToken(client_id, client_secret)
-    if (not token.validate()):
+    if not token.validate():
         logging.error("Token isn't valid")
-        exit(1)
+        sys.exit(1)
     try:
         team_users = TeamUsers()
         team_users.get(args.team, client_id=client_id, oauth_token=token.token)
@@ -114,7 +116,7 @@ def main():
     finally:
         token.revoke()
         elapsed_time = time.time() - start_time
-        logging.info(f"Execution time: {elapsed_time} seconds")
+        logging.info("Execution time: %s seconds", elapsed_time)
 
 
 if __name__ == '__main__':

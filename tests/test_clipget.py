@@ -22,19 +22,20 @@ example_users_list = [{
     'followers': 1182,
     'game': 'Hearthstone: Heroes of Warcraft',
     'language': 'en',
-    'logo': 'https://static-cdn.jtvnw.net/jtv_user_pictures/sarbandia-profile_image-6693b5952f31c847-300x300.jpeg',
+    'logo': 'https://static-cdn.jtvnw.net/jtv_user_pictures/'
+            'sarbandia-profile_image-6693b5952f31c847-300x300.jpeg',
     'mature': False,
     'name': 'sarbandia',
     'partner': False,
-    'profile_banner': 'https://static-cdn.jtvnw.net/jtv_user_pictures/sarbandia-profile_banner-247cdbe62dbcf4d9-480.jpeg',
+    'profile_banner': 'https://static-cdn.jtvnw.net/jtv_user_pictures/'
+                      'sarbandia-profile_banner-247cdbe62dbcf4d9-480.jpeg',
     'profile_banner_background_color': None,
     'status': 'Midrange shaman laddering',
     'updated_at': '2016-12-15T19:02:40Z',
     'url': 'https://www.twitch.tv/sarbandia',
     'video_banner': None,
     'views': 8168
-},
-{
+}, {
     '_id': 5582098,
     'broadcaster_language': 'es',
     'created_at': '2009-04-13T21:22:28Z',
@@ -42,11 +43,13 @@ example_users_list = [{
     'followers': 1182,
     'game': 'Hearthstone: Heroes of Warcraft',
     'language': 'en',
-    'logo': 'https://static-cdn.jtvnw.net/jtv_user_pictures/sarbandia-profile_image-6693b5952f31c847-300x300.jpeg',
+    'logo': 'https://static-cdn.jtvnw.net/jtv_user_pictures/'
+            'sarbandia-profile_image-6693b5952f31c847-300x300.jpeg',
     'mature': False,
     'name': 'sarbandia2',
     'partner': False,
-    'profile_banner': 'https://static-cdn.jtvnw.net/jtv_user_pictures/sarbandia-profile_banner-247cdbe62dbcf4d9-480.jpeg',
+    'profile_banner': 'https://static-cdn.jtvnw.net/jtv_user_pictures/'
+                      'sarbandia-profile_banner-247cdbe62dbcf4d9-480.jpeg',
     'profile_banner_background_color': None,
     'status': 'Midrange shaman laddering',
     'updated_at': '2016-12-15T19:02:40Z',
@@ -173,6 +176,7 @@ example_clips_resp_invalid_started_or_ended_at = {
 
 @responses.activate
 def test__get_avg_viewers_in_past_week_user_exists_ret_avg():
+    expected_avg = 1000
     responses.add(responses.GET,
                   f'{BASE_TWITCHMETRICS_URL}/c/{example_users_list[0]["_id"]}-'
                   f'{example_users_list[0]["name"]}/recent_viewership_values',
@@ -183,11 +187,12 @@ def test__get_avg_viewers_in_past_week_user_exists_ret_avg():
     getter = ClipGetter(example_users_list)
     avg = getter._get_avg_viewers_in_past_week(example_users_list[0]['_id'],
                                                example_users_list[0]['name'])
-    assert 1000 == avg
+    assert expected_avg == avg
 
 
 @responses.activate
 def test__get_avg_viewers_in_past_week_user_doesnt_exist_ret_0():
+    expected_avg = 0
     responses.add(responses.GET,
                   f'{BASE_TWITCHMETRICS_URL}/c/{example_users_list[0]["_id"]}-'
                   f'{example_users_list[0]["name"]}/recent_viewership_values',
@@ -198,11 +203,12 @@ def test__get_avg_viewers_in_past_week_user_doesnt_exist_ret_0():
     getter = ClipGetter(example_users_list)
     avg = getter._get_avg_viewers_in_past_week(example_users_list[0]['_id'],
                                                example_users_list[0]['name'])
-    assert 0 == avg
+    assert expected_avg == avg
 
 
 @responses.activate
 def test__get_avg_viewers_in_past_week_user_didnt_stream_ret_0():
+    expected_avg = 0
     responses.add(responses.GET,
                   f'{BASE_TWITCHMETRICS_URL}/c/{example_users_list[0]["_id"]}-'
                   f'{example_users_list[0]["name"]}/recent_viewership_values',
@@ -213,11 +219,12 @@ def test__get_avg_viewers_in_past_week_user_didnt_stream_ret_0():
     getter = ClipGetter(example_users_list)
     avg = getter._get_avg_viewers_in_past_week(example_users_list[0]['_id'],
                                                example_users_list[0]['name'])
-    assert 0 == avg
+    assert expected_avg == avg
 
 
 @responses.activate
-def test__get_avg_viewers_in_past_week_user_didnt_stream_ret_0():
+def test__get_avg_viewers_in_past_week_cant_find_user_ret_0():
+    expected_avg = 0
     responses.add(responses.GET,
                   f'{BASE_TWITCHMETRICS_URL}/c/{example_users_list[0]["_id"]}-'
                   f'{example_users_list[0]["name"]}/recent_viewership_values',
@@ -227,8 +234,8 @@ def test__get_avg_viewers_in_past_week_user_didnt_stream_ret_0():
     getter = ClipGetter(example_users_list)
     avg = getter._get_avg_viewers_in_past_week(example_users_list[0]['_id'],
                                                example_users_list[0]['name'])
-    assert 0 == avg
-    
+    assert expected_avg == avg
+
 
 @responses.activate
 def test__get_avg_viewers_in_past_week_gt_400_status_code_throws_exception():
@@ -245,15 +252,17 @@ def test__get_avg_viewers_in_past_week_gt_400_status_code_throws_exception():
 
 
 def test__get_clip_rating_low_clip_views_high_avg_ret_gt_1():
+    expected_rating = 1
     getter = ClipGetter(example_users_list)
     rating = getter._get_clip_rating(250, 1000)
-    assert 1 < rating
+    assert expected_rating < rating
 
 
 def test__get_clip_rating_low_clip_views_high_avg_ret_lt_1():
+    expected_rating = 1
     getter = ClipGetter(example_users_list)
     rating = getter._get_clip_rating(150, 1000)
-    assert 1 > rating
+    assert expected_rating > rating
 
 
 @responses.activate
@@ -357,8 +366,8 @@ def test__get_good_clips_invalid_client_id_and_token_throw_exception():
 
     getter = ClipGetter(example_users_list)
     with pytest.raises(requests.HTTPError):
-        clips = getter._get_good_clips(example_users_list[0]["_id"],
-                                       example_users_list[0]["name"])
+        getter._get_good_clips(example_users_list[0]["_id"],
+                               example_users_list[0]["name"])
 
 
 @responses.activate
@@ -460,9 +469,9 @@ def test__get_good_clips_invalid_started_at_throw_exception():
 
     getter = ClipGetter(example_users_list, started_at=started_at)
     with pytest.raises(requests.HTTPError):
-        clips = getter._get_good_clips(example_users_list[0]["_id"],
-                                       example_users_list[0]["name"],
-                                       oauth_token=example_app_access_token)
+        getter._get_good_clips(example_users_list[0]["_id"],
+                               example_users_list[0]["name"],
+                               oauth_token=example_app_access_token)
 
 
 @responses.activate
@@ -486,9 +495,9 @@ def test__get_good_clips_invalid_ended_at_throw_exception():
 
     getter = ClipGetter(example_users_list, ended_at=ended_at)
     with pytest.raises(requests.HTTPError):
-        clips = getter._get_good_clips(example_users_list[0]["_id"],
-                                       example_users_list[0]["name"],
-                                       oauth_token=example_app_access_token)
+        getter._get_good_clips(example_users_list[0]["_id"],
+                               example_users_list[0]["name"],
+                               oauth_token=example_app_access_token)
 
 
 @responses.activate
@@ -578,7 +587,7 @@ def test_get_clips_invalid_client_id_and_token_throws_exception():
 
     getter = ClipGetter(example_users_list)
     with pytest.raises(requests.HTTPError):
-        clips = getter.get_clips()
+        getter.get_clips()
 
 
 @responses.activate
