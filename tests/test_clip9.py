@@ -168,7 +168,7 @@ def test__parse_credentials_cfg_file_doesnt_exist_exit():
 
 
 def test__parse_credentials_cfg_file_no_creds_header_exit():
-    with pytest.raises(SystemExit):
+    with pytest.raises(KeyError):
         clip9._parse_credentials_cfg('tests/resources/no_creds_header.cfg')
 
 
