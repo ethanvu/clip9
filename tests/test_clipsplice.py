@@ -1,6 +1,5 @@
 """Tests the clipsplice module."""
 
-from pathlib import Path
 from unittest.mock import patch, mock_open
 
 import pyppeteer
@@ -241,75 +240,3 @@ def test__download_clip_invalid_path_throws_exception(mocker):
     splicer = ClipSplicer(example_clip_list)
     with pytest.raises(FileNotFoundError):
         splicer._download_clip(example_clip_list[0], path)
-
-
-@pytest.mark.filterwarnings('ignore::UserWarning')
-def test_splice_valid_clips_mp4_success(mocker):
-    result_file_name = './result.mp4'
-    clips_dir = 'tests/resources/'
-    mocker.patch('clipsplice.ClipSplicer._download_clip')
-
-    splicer = ClipSplicer(example_clip_list)
-    splicer.splice(result_file_name, clips_dir=clips_dir)
-    result_file = Path(f'{result_file_name}')
-    assert result_file.is_file()
-    result_file.unlink()
-
-
-@pytest.mark.filterwarnings('ignore::UserWarning')
-def test_splice_valid_clips_ogv_success(mocker):
-    result_file_name = './result.ogv'
-    clips_dir = 'tests/resources/'
-    mocker.patch('clipsplice.ClipSplicer._download_clip')
-
-    splicer = ClipSplicer(example_clip_list)
-    splicer.splice(result_file_name, clips_dir=clips_dir)
-    result_file = Path(f'{result_file_name}')
-    assert result_file.is_file()
-    result_file.unlink()
-
-
-@pytest.mark.filterwarnings('ignore::UserWarning')
-def test_splice_valid_clips_webm_success(mocker):
-    result_file_name = './result.webm'
-    clips_dir = 'tests/resources/'
-    mocker.patch('clipsplice.ClipSplicer._download_clip')
-
-    splicer = ClipSplicer(example_clip_list)
-    splicer.splice(result_file_name, clips_dir=clips_dir)
-    result_file = Path(f'{result_file_name}')
-    assert result_file.is_file()
-    result_file.unlink()
-
-
-@pytest.mark.filterwarnings('ignore::UserWarning')
-def test_splice_valid_clips_avi_success(mocker):
-    result_file_name = './result.avi'
-    clips_dir = 'tests/resources/'
-    mocker.patch('clipsplice.ClipSplicer._download_clip')
-
-    splicer = ClipSplicer(example_clip_list)
-    splicer.splice(result_file_name, clips_dir=clips_dir)
-    result_file = Path(f'{result_file_name}')
-    assert result_file.is_file()
-    result_file.unlink()
-
-
-def test_splice_invalid_clips_no_result_file(mocker):
-    result_file_name = './result.mp4'
-    mocker.patch('clipsplice.ClipSplicer._download_clip',
-                 side_effect=requests.HTTPError)
-
-    splicer = ClipSplicer(example_clip_list)
-    splicer.splice(result_file_name)
-    result_file = Path(f'{result_file_name}')
-    assert not result_file.is_file()
-
-
-def test_splice_no_clips_no_result_file():
-    result_file_name = './result.mp4'
-
-    splicer = ClipSplicer([])
-    splicer.splice(result_file_name)
-    result_file = Path(f'{result_file_name}')
-    assert not result_file.is_file()

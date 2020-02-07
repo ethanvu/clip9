@@ -57,7 +57,7 @@ def _parse_args():
     return args
 
 
-def _parse_credentials_cfg(cfg_file_name):
+def _read_credentials_cfg(cfg_file_name):
     logging.info('Loading %s', cfg_file_name)
     if not os.path.isfile(cfg_file_name):
         logging.error("%s doesn't exist", cfg_file_name)
@@ -66,16 +66,29 @@ def _parse_credentials_cfg(cfg_file_name):
     config = ConfigParser()
     config.read(cfg_file_name)
     logging.info("Loaded %s", cfg_file_name)
+
+    credentials = _parse_credentials_cfg(config)
+
+    if credentials is None:
+        sys.exit(1)
+    return credentials
+
+
+def _parse_credentials_cfg(config):
+    if not config.has_section('credentials'):
+        logging.error("credentials.cfg does not have a 'credentials' section")
+        return None
+
     credentials = config['credentials']
 
     if 'TWITCH_CLIENT_ID' not in credentials:
         logging.error("credentials.cfg does not contain TWITCH_CLIENT_ID")
-        sys.exit(1)
+        return None
     logging.info("Loaded TWITCH_CLIENT_ID")
 
     if 'TWITCH_CLIENT_SECRET' not in credentials:
         logging.error("credentials.cfg does not contain TWITCH_CLIENT_SECRET")
-        sys.exit(1)
+        return None
     logging.info("Loaded TWITCH_CLIENT_SECRET")
 
     return credentials
@@ -92,7 +105,7 @@ def main():
     logging.info("-------STARTING CLIP9-------")
 
     cfg_file_name = f'{os.path.dirname(sys.argv[0])}/../credentials.cfg'
-    credentials = _parse_credentials_cfg(cfg_file_name)
+    credentials = _read_credentials_cfg(cfg_file_name)
     client_id = credentials['TWITCH_CLIENT_ID']
     client_secret = credentials['TWITCH_CLIENT_SECRET']
 
