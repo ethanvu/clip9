@@ -99,6 +99,14 @@ class ClipSplicer():
         logging.info("Downloaded %s.mp4", clip['id'])
 
 
+    def _splice_clips(self, result_file_name, file_list):
+        result = concatenate_videoclips(file_list)
+        if result_file_name[-4:] == '.avi':
+            result.write_videofile(f'{result_file_name}', codec='png')
+        else:
+            result.write_videofile(f'{result_file_name}')
+
+
     def splice(self, result_file_name, clips_dir='./'):
         """Splices the clips in clips_list into an mp4, ogv, webm, or
         avi file.
@@ -123,11 +131,7 @@ class ClipSplicer():
             logging.warning("Some clips couldn't be downloaded: %s", fail_list)
 
         if len(file_list) > 0:
-            result = concatenate_videoclips(file_list)
             logging.info("Writing %s", result_file_name)
-            if result_file_name[-4:] == '.avi':
-                result.write_videofile(f'{result_file_name}', codec='png')
-            else:
-                result.write_videofile(f'{result_file_name}')
+            self._splice_clips(result_file_name, file_list)
         else:
             logging.info("No clips to splice")

@@ -156,27 +156,40 @@ def test__parse_args_log_file_short_success():
     assert args.log_file == 'clip9.log'
 
 
-def test__parse_credentials_cfg_file_exists_ret_creds():
-    credentials = clip9._parse_credentials_cfg('credentials_template.cfg')
+def test__parse_credentials_cfg_proper_config_ret_creds():
+    cfg_string = ('[credentials]\n'
+                  'TWITCH_CLIENT_ID=uo6dggojyb8d6soh92zknwmi5ej1q2\n'
+                  'TWITCH_CLIENT_SECRET=nyo51xcdrerl8z9m56w9w6wg\n')
+    config = ConfigParser()
+    config.read_string(cfg_string)
+    credentials = clip9._parse_credentials_cfg(config)
     assert credentials['TWITCH_CLIENT_ID'] == 'uo6dggojyb8d6soh92zknwmi5ej1q2'
     assert credentials['TWITCH_CLIENT_SECRET'] == 'nyo51xcdrerl8z9m56w9w6wg'
 
 
-def test__parse_credentials_cfg_file_doesnt_exist_exit():
-    with pytest.raises(SystemExit):
-        clip9._parse_credentials_cfg('doesnt_exist.cfg')
+def test__parse_credentials_cfg_no_creds_header_exit():
+    cfg_string = ('[a]\n'
+                  'TWITCH_CLIENT_ID=uo6dggojyb8d6soh92zknwmi5ej1q2\n'
+                  'TWITCH_CLIENT_SECRET=nyo51xcdrerl8z9m56w9w6wg\n')
+    config = ConfigParser()
+    config.read_string(cfg_string)
+    credentials = clip9._parse_credentials_cfg(config)
+    assert credentials is None
 
 
-def test__parse_credentials_cfg_file_no_creds_header_exit():
-    with pytest.raises(SystemExit):
-        clip9._parse_credentials_cfg('tests/resources/no_creds_header.cfg')
+def test__parse_credentials_cfg_no_id_key_exit():
+    cfg_string = ('[credentials]\n'
+                  'TWITCH_CLIENT_SECRET=nyo51xcdrerl8z9m56w9w6wg\n')
+    config = ConfigParser()
+    config.read_string(cfg_string)
+    credentials = clip9._parse_credentials_cfg(config)
+    assert credentials is None
 
 
-def test__parse_credentials_cfg_file_no_id_key_exit():
-    with pytest.raises(SystemExit):
-        clip9._parse_credentials_cfg('tests/resources/no_id_key.cfg')
-
-
-def test__parse_credentials_cfg_file_no_secret_key_exit():
-    with pytest.raises(SystemExit):
-        clip9._parse_credentials_cfg('tests/resources/no_secret_key.cfg')
+def test__parse_credentials_cfg_no_secret_key_exit():
+    cfg_string = ('[credentials]\n'
+                  'TWITCH_CLIENT_ID=uo6dggojyb8d6soh92zknwmi5ej1q2\n')
+    config = ConfigParser()
+    config.read_string(cfg_string)
+    credentials = clip9._parse_credentials_cfg(config)
+    assert credentials is None
