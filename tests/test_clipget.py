@@ -1,10 +1,14 @@
 """Tests the clipget module."""
 
 import json
+from unittest.mock import Mock
 
 import pytest
 import requests
 import responses
+from twitch import TwitchHelix
+from twitch.resources import Clip
+from twitch.resources import Video
 
 from constants import BASE_HELIX_URL
 from constants import BASE_TWITCHMETRICS_URL
@@ -249,6 +253,30 @@ def test__get_avg_viewers_in_past_week_gt_400_status_code_throws_exception():
     with pytest.raises(requests.HTTPError):
         getter._get_avg_viewers_in_past_week(example_users_list[0]['_id'],
                                              example_users_list[0]['name'])
+
+
+def test__get_clip_video_views_clip_empty_video_id_ret_neg_1():
+    clip = Clip()
+    clip.id = 'AwkwardHelplessSalamanderSwiftRage'
+    clip.video_id = ''
+    getter = ClipGetter(example_users_list)
+
+    views = getter._get_clip_video_views(clip)
+    assert -1 == views
+
+
+def test__get_clip_video_views_clip_video_id_ret_views():
+    clip = Clip()
+    clip.id = 'AwkwardHelplessSalamanderSwiftRage'
+    clip.video_id = '205586603'
+    video = Video()
+    video.view_count = 10
+    getter = ClipGetter(example_users_list)
+    getter.client = TwitchHelix(client_id=example_client_id)
+    getter.client.get_videos = Mock(return_value=[video])
+
+    views = getter._get_clip_video_views(clip)
+    assert 10 == views
 
 
 def test__get_clip_rating_low_clip_views_high_avg_ret_gt_1():

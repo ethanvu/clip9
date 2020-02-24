@@ -3,6 +3,7 @@
 import logging
 
 import requests
+from twitch import TwitchHelix
 
 from constants import BASE_TWITCHMETRICS_URL
 
@@ -26,6 +27,7 @@ class ClipGetter:
         self.started_at = started_at
         self.ended_at = ended_at
         self.lang = lang
+        self.client = None
 
 
     def _get_avg_viewers_in_past_week(self, user_id, user_name):
@@ -63,9 +65,18 @@ class ClipGetter:
         return avg_views
 
 
-    def _get_clip_rating(self, clip_views, avg_viewers):
-        """Return a rating for the given clip."""
-        return clip_views / (avg_viewers/9 + 100)
+    def _get_clip_video_views(self, clip):
+        """Returns the view count of the video that a clip was created from."""
+        logging.info("Getting video views for clip %s", clip.id)
+        if clip.video_id == '':
+            return -1
+        video = self.client.get_videos(video_ids=[clip.video_id])[0]
+        return video.view_count
+
+
+    def _get_clip_rating(self, clip_views, stream_views):
+        """Return a rating given the view count of a clip and a stream."""
+        return clip_views / (stream_views/9 + 100)
 
 
     def _get_good_clips(self, user_id, user_name, client_id=None,
@@ -124,6 +135,7 @@ class ClipGetter:
         https://dev.twitch.tv/docs/api/reference/#get-clips
         """
         logging.info("Getting clips")
+        self.client = TwitchHelix(client_id=client_id, oauth_token=oauth_token)
         total_clips = []
         for user in self.users_list:
             if (self.lang is None
