@@ -65,18 +65,64 @@ class ClipGetter:
         return avg_views
 
 
+    def _get_clips(self, user_id, user_name, client_id=None, oauth_token=None):
+        """Returns a list of clips for a user."""
+        logging.info("Getting clips for %s", user_name)
+        clip_headers = {}
+        if client_id is not None:
+            clip_headers['Client-ID'] = client_id
+        if oauth_token is not None:
+            clip_headers['Authorization'] = f'Bearer {oauth_token}'
+        clip_params = {
+            'broadcaster_id': user_id,
+            'started_at': self.started_at,
+            'ended_at': self.ended_at,
+            'first': 100,
+        }
+        resp = requests.get(f'https://api.twitch.tv/helix/clips',
+                            headers=clip_headers, params=clip_params)
+        resp_json = resp.json()
+
+        if resp.status_code >= 400:
+            logging.error("Error when getting clips of streamer %s: %s",
+                          user_name, resp_json['message'])
+            resp.raise_for_status()
+
+        logging.info("Got a list of clips of streamer %s", user_name)
+        clips = resp_json['data']
+        return clips
+
+
     def _get_clip_video_views(self, clip):
         """Returns the view count of the video that a clip was created from."""
         logging.info("Getting video views for clip %s", clip.id)
         if clip.video_id == '':
-            return -1
+            return 900  # Default video views
         video = self.client.get_videos(video_ids=[clip.video_id])[0]
         return video.view_count
 
 
-    def _get_clip_rating(self, clip_views, stream_views):
-        """Return a rating given the view count of a clip and a stream."""
-        return clip_views / (stream_views/9 + 100)
+    def _get_clip_rating(self, clip_views, video_views):
+        """Return a rating given the view count of a clip and a video."""
+        return clip_views / (video_views/9 + 100)
+
+
+    def _get_good_clips1(self, clips):
+        """Return a subset of 'good' clips from a list of clips."""
+        logging.info("Getting good clips from %s clip(s)", len(clips))
+        good_clips = []
+        for clip in clips:
+            logging.debug("Clip %s by %s has %s views", clip['id'],
+                          clip['broadcaster_name'], clip['view_count'])
+            video_views = self._get_clip_video_views(clip)
+            clip['rating'] = self._get_clip_rating(clip['view_count'],
+                                                   video_views)
+            logging.info("Clip %s rating %s", clip['id'], clip['rating'])
+            if clip['rating'] >= 1:
+                logging.info("Clip %s is 'good'", clip['id'])
+                good_clips.append(clip)
+        logging.info("Found %s good clip(s) for %s", len(good_clips))
+        return good_clips
 
 
     def _get_good_clips(self, user_id, user_name, client_id=None,
