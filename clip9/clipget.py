@@ -186,9 +186,10 @@ class ClipGetter:
         for user in self.users_list:
             if (self.lang is None
                     or user['broadcaster_language'] == self.lang):
-                clips = self._get_good_clips(user['_id'], user['name'],
-                                             client_id, oauth_token)
-                if clips:
-                    total_clips.extend(clips)
+                clips = self._get_clips(user['_id'], user['name'],
+                                        client_id, oauth_token)
+                good_clips = self._get_good_clips1(clips)
+                if good_clips:
+                    total_clips.extend(good_clips)
         logging.info("Got %s clips", len(total_clips))
         return total_clips

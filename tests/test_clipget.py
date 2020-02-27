@@ -887,32 +887,13 @@ def test__get_good_clips_invalid_ended_at_throw_exception():
 
 @responses.activate
 def test_get_clips_all_lang_valid_client_id_ret_clips():
-    responses.add(responses.GET,
-                  f'{BASE_TWITCHMETRICS_URL}/c/{example_users_list[0]["_id"]}-'
-                  f'{example_users_list[0]["name"]}/recent_viewership_values',
-                  body=json.dumps(example_twitchmetrics_viewership_resp),
-                  status=200,
-                  content_type='application/json')
-    responses.add(responses.GET,
-                  f'{BASE_HELIX_URL}/clips?'
-                  f'broadcaster_id={example_users_list[0]["_id"]}',
-                  body=json.dumps(example_clips_resp),
-                  status=200,
-                  content_type='application/json')
-    responses.add(responses.GET,
-                  f'{BASE_TWITCHMETRICS_URL}/c/{example_users_list[1]["_id"]}-'
-                  f'{example_users_list[1]["name"]}/recent_viewership_values',
-                  body=json.dumps(example_twitchmetrics_viewership_resp),
-                  status=200,
-                  content_type='application/json')
-    responses.add(responses.GET,
-                  f'{BASE_HELIX_URL}/clips?'
-                  f'broadcaster_id={example_users_list[1]["_id"]}',
-                  body=json.dumps(example_clips_resp2),
-                  status=200,
-                  content_type='application/json')
-
     getter = ClipGetter(example_users_list)
+    ret_clips = [example_clips_resp['data'], example_clips_resp2['data']]
+    getter._get_clips = Mock(side_effect=ret_clips)
+    ret_good = [[example_clips_resp['data'][0]],
+                [example_clips_resp2['data'][0]]]
+    getter._get_good_clips1 = Mock(side_effect=ret_good)
+
     clips = getter.get_clips(client_id=example_client_id)
     assert len(clips) == 2
     assert clips[0]['id'] == 'RandomClip1'
@@ -921,32 +902,13 @@ def test_get_clips_all_lang_valid_client_id_ret_clips():
 
 @responses.activate
 def test_get_clips_all_lang_valid_token_ret_clips():
-    responses.add(responses.GET,
-                  f'{BASE_TWITCHMETRICS_URL}/c/{example_users_list[0]["_id"]}-'
-                  f'{example_users_list[0]["name"]}/recent_viewership_values',
-                  body=json.dumps(example_twitchmetrics_viewership_resp),
-                  status=200,
-                  content_type='application/json')
-    responses.add(responses.GET,
-                  f'{BASE_HELIX_URL}/clips?'
-                  f'broadcaster_id={example_users_list[0]["_id"]}',
-                  body=json.dumps(example_clips_resp),
-                  status=200,
-                  content_type='application/json')
-    responses.add(responses.GET,
-                  f'{BASE_TWITCHMETRICS_URL}/c/{example_users_list[1]["_id"]}-'
-                  f'{example_users_list[1]["name"]}/recent_viewership_values',
-                  body=json.dumps(example_twitchmetrics_viewership_resp),
-                  status=200,
-                  content_type='application/json')
-    responses.add(responses.GET,
-                  f'{BASE_HELIX_URL}/clips?'
-                  f'broadcaster_id={example_users_list[1]["_id"]}',
-                  body=json.dumps(example_clips_resp2),
-                  status=200,
-                  content_type='application/json')
-
     getter = ClipGetter(example_users_list)
+    ret_clips = [example_clips_resp['data'], example_clips_resp2['data']]
+    getter._get_clips = Mock(side_effect=ret_clips)
+    ret_good = [[example_clips_resp['data'][0]],
+                [example_clips_resp2['data'][0]]]
+    getter._get_good_clips1 = Mock(side_effect=ret_good)
+
     clips = getter.get_clips(oauth_token=example_app_access_token)
     assert len(clips) == 2
     assert clips[0]['id'] == 'RandomClip1'
@@ -954,43 +916,13 @@ def test_get_clips_all_lang_valid_token_ret_clips():
 
 
 @responses.activate
-def test_get_clips_invalid_client_id_and_token_throws_exception():
-    responses.add(responses.GET,
-                  f'{BASE_TWITCHMETRICS_URL}/c/{example_users_list[0]["_id"]}-'
-                  f'{example_users_list[0]["name"]}/recent_viewership_values',
-                  body=json.dumps(example_twitchmetrics_viewership_resp),
-                  status=200,
-                  content_type='application/json')
-    responses.add(responses.GET,
-                  f'{BASE_HELIX_URL}/clips?'
-                  f'broadcaster_id={example_users_list[0]["_id"]}',
-                  body=json.dumps(
-                      example_clips_resp_invalid_client_id_and_token
-                  ),
-                  status=401,
-                  content_type='application/json')
-
-    getter = ClipGetter(example_users_list)
-    with pytest.raises(requests.HTTPError):
-        getter.get_clips()
-
-
-@responses.activate
 def test_get_clips_lang_en_ret_less_clips():
-    responses.add(responses.GET,
-                  f'{BASE_TWITCHMETRICS_URL}/c/{example_users_list[0]["_id"]}-'
-                  f'{example_users_list[0]["name"]}/recent_viewership_values',
-                  body=json.dumps(example_twitchmetrics_viewership_resp),
-                  status=200,
-                  content_type='application/json')
-    responses.add(responses.GET,
-                  f'{BASE_HELIX_URL}/clips?'
-                  f'broadcaster_id={example_users_list[0]["_id"]}',
-                  body=json.dumps(example_clips_resp),
-                  status=200,
-                  content_type='application/json')
-
     getter = ClipGetter(example_users_list, lang='en')
+    ret_clips = [example_clips_resp['data']]
+    getter._get_clips = Mock(side_effect=ret_clips)
+    ret_good = [[example_clips_resp['data'][0]]]
+    getter._get_good_clips1 = Mock(side_effect=ret_good)
+
     clips = getter.get_clips(oauth_token=example_app_access_token)
     assert len(clips) == 1
     assert clips[0]['id'] == 'RandomClip1'
