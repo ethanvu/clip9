@@ -4,6 +4,7 @@ import logging
 
 import requests
 from twitch import TwitchHelix
+from twitch.resources import Clip
 
 
 class ClipGetter:
@@ -52,7 +53,10 @@ class ClipGetter:
             resp.raise_for_status()
 
         logging.info("Got a list of clips of streamer %s", user_name)
-        clips = resp_json['data']
+        clips_json = resp_json['data']
+        clips = []
+        for clip_json in clips_json:
+            clips.append(Clip.construct_from(clip_json))
         return clips
 
 
