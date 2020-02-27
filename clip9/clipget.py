@@ -62,10 +62,10 @@ class ClipGetter:
 
     def _get_clip_video_views(self, clip):
         """Returns the view count of the video that a clip was created from."""
-        logging.info("Getting video views for clip %s", clip.id)
-        if clip.video_id == '':
+        logging.info("Getting video views for clip %s", clip['id'])
+        if clip['video_id'] == '':
             return 900  # Default video views
-        video = self.client.get_videos(video_ids=[clip.video_id])[0]
+        video = self.client.get_videos(video_ids=[clip['video_id']])[0]
         return video.view_count
 
 
@@ -82,13 +82,14 @@ class ClipGetter:
             logging.debug("Clip %s by %s has %s views", clip['id'],
                           clip['broadcaster_name'], clip['view_count'])
             video_views = self._get_clip_video_views(clip)
+            logging.debug("Clip %s's video %s has %s views", clip['id'],
+                          clip['video_id'], video_views)
             clip['rating'] = self._get_clip_rating(clip['view_count'],
                                                    video_views)
             logging.info("Clip %s rating %s", clip['id'], clip['rating'])
             if clip['rating'] >= 1:
                 logging.info("Clip %s is 'good'", clip['id'])
                 good_clips.append(clip)
-        logging.info("Found %s good clip(s) for %s", len(good_clips))
         return good_clips
 
 
@@ -108,6 +109,8 @@ class ClipGetter:
                 clips = self._get_clips(user['_id'], user['name'],
                                         client_id, oauth_token)
                 good_clips = self._get_good_clips(clips)
+                logging.info("Found %s good clip(s) for %s", len(good_clips),
+                             user['name'])
                 if good_clips:
                     total_clips.extend(good_clips)
         logging.info("Got %s clips", len(total_clips))
