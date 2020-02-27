@@ -1,6 +1,7 @@
 # codecov
 .coverage
 coverage.xml
+htmlcov/
 
 # credentials
 credentials.cfg
