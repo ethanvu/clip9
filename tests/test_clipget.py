@@ -89,7 +89,7 @@ example_clips_resp = {
             'creator_name': 'MrMarshall',
             'video_id': '1234567',
             'game_id': '33103',
-            'language': 'en',
+            'language': 'es',
             'title': 'random1',
             'view_count': 150,
             'created_at': '2019-8-20T22:35:18Z',
@@ -265,6 +265,15 @@ def test__get_good_clips_2_good_clip_ret_clips():
     assert clips[1]['id'] == 'RandomClip2'
 
 
+def test_get_get_good_clips_lang_en_ret_less_clips():
+    getter = ClipGetter(example_users_list, lang={'en'})
+    getter._get_clip_video_views = Mock(return_value=450)
+
+    clips = getter._get_good_clips(example_clips_resp['data'])
+    assert len(clips) == 1
+    assert clips[0]['id'] == 'RandomClip1'
+
+
 def test__get_good_clips_no_clips_ret_no_clips():
     getter = ClipGetter(example_users_list)
 
@@ -272,8 +281,7 @@ def test__get_good_clips_no_clips_ret_no_clips():
     assert len(clips) == 0
 
 
-@responses.activate
-def test_get_clips_all_lang_valid_client_id_ret_clips():
+def test_get_clips_valid_client_id_ret_clips():
     getter = ClipGetter(example_users_list)
     ret_clips = [example_clips_resp['data'], example_clips_resp2['data']]
     getter._get_clips = Mock(side_effect=ret_clips)
@@ -287,8 +295,7 @@ def test_get_clips_all_lang_valid_client_id_ret_clips():
     assert clips[1]['id'] == 'RandomClip3'
 
 
-@responses.activate
-def test_get_clips_all_lang_valid_token_ret_clips():
+def test_get_clips_valid_token_ret_clips():
     getter = ClipGetter(example_users_list)
     ret_clips = [example_clips_resp['data'], example_clips_resp2['data']]
     getter._get_clips = Mock(side_effect=ret_clips)
@@ -302,14 +309,12 @@ def test_get_clips_all_lang_valid_token_ret_clips():
     assert clips[1]['id'] == 'RandomClip3'
 
 
-@responses.activate
-def test_get_clips_lang_en_ret_less_clips():
-    getter = ClipGetter(example_users_list, lang={'en'})
-    ret_clips = [example_clips_resp['data']]
+def test_get_clips_no_good_clips_ret_no_clips():
+    getter = ClipGetter(example_users_list)
+    ret_clips = [example_clips_resp['data'], example_clips_resp2['data']]
     getter._get_clips = Mock(side_effect=ret_clips)
-    ret_good = [[example_clips_resp['data'][0]]]
+    ret_good = [[], []]
     getter._get_good_clips = Mock(side_effect=ret_good)
 
     clips = getter.get_clips(oauth_token=example_app_access_token)
-    assert len(clips) == 1
-    assert clips[0]['id'] == 'RandomClip1'
+    assert len(clips) == 0
