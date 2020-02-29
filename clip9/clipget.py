@@ -104,8 +104,7 @@ class ClipGetter:
         self.client = TwitchHelix(client_id=client_id, oauth_token=oauth_token)
         total_clips = []
         for user in self.users_list:
-            if (self.lang is None
-                    or user['broadcaster_language'] == self.lang):
+            if (self.lang is None or user['language'] in self.lang):
                 clips = self._get_clips(user['_id'], user['name'],
                                         client_id, oauth_token)
                 good_clips = self._get_good_clips(clips)

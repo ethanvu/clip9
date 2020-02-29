@@ -45,7 +45,7 @@ example_users_list = [{
     'display_name': 'Sarbandia2',
     'followers': 1182,
     'game': 'Hearthstone: Heroes of Warcraft',
-    'language': 'en',
+    'language': 'es',
     'logo': 'https://static-cdn.jtvnw.net/jtv_user_pictures/'
             'sarbandia-profile_image-6693b5952f31c847-300x300.jpeg',
     'mature': False,
@@ -304,7 +304,7 @@ def test_get_clips_all_lang_valid_token_ret_clips():
 
 @responses.activate
 def test_get_clips_lang_en_ret_less_clips():
-    getter = ClipGetter(example_users_list, lang='en')
+    getter = ClipGetter(example_users_list, lang={'en'})
     ret_clips = [example_clips_resp['data']]
     getter._get_clips = Mock(side_effect=ret_clips)
     ret_good = [[example_clips_resp['data'][0]]]

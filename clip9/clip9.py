@@ -44,16 +44,19 @@ def _parse_args():
                         "e.g. 2019-08-19T00:00:00Z.")
     parser.add_argument('-c', '--clips_dir',
                         action='store',
+                        default='./',
                         help="Directory to download the clips into.")
     parser.add_argument('-l', '--lang',
                         action='store',
-                        help="Language of clips to get.")
+                        nargs='+',
+                        help=("Language of clips to get, e.g. 'en' for English"
+                              ", 'ko' for Korean, 'es' for Spanish."))
     parser.add_argument('-L', '--log_file',
                         action='store',
                         help="Name of the log file.")
     args = parser.parse_args()
-    if args.clips_dir is None:
-        args.clips_dir = './'
+    if args.lang is not None:
+        args.lang = set(args.lang)
     return args
 
 
