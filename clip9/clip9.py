@@ -101,8 +101,12 @@ def main():
     """Executes the Clip9 main script."""
     start_time = time.time()
     args = _parse_args()
-    logging.basicConfig(level=logging.INFO, filename=args.log_file,
-                        format='[%(asctime)s]%(levelname)s: %(message)s')
+    level = logging.INFO
+    format = '[%(asctime)s]%(levelname)s: %(message)s'
+    if args.log_file is None:
+        logging.basicConfig(level=level, stream=sys.stdout, format=format)
+    else:
+        logging.basicConfig(level=level, filename=args.log_file, format=format)
     sys.excepthook = handle_exception
 
     logging.info("-------STARTING CLIP9-------")
