@@ -3,9 +3,8 @@
 import logging
 
 import requests
-
-from constants import BASE_TWITCHMETRICS_URL
-
+from twitch import TwitchHelix
+from twitch.resources import Clip
 
 class ClipGetter:
     """Gets 'good' clips for streamers in a Twitch team since a certain
@@ -26,58 +25,10 @@ class ClipGetter:
         self.started_at = started_at
         self.ended_at = ended_at
         self.lang = lang
+        self.client = None
 
-
-    def _get_avg_viewers_in_past_week(self, user_id, user_name):
-        """Return the average viewers of a user in the past week."""
-        logging.info("Getting average view count for %s", user_name)
-        resp = requests.get(f'{BASE_TWITCHMETRICS_URL}/c/{user_id}-{user_name}'
-                            f'/recent_viewership_values')
-
-        if resp.status_code == 404:
-            logging.info("Couldn't find weekly viewer stats for %s.  Skipping "
-                         "getting clips for this user.", user_name)
-            return 0
-
-        if resp.status_code >= 400:
-            logging.error("Error when getting weekly viewer stats of %s: Got "
-                          "status code %s", user_name, resp.status_code)
-            resp.raise_for_status()
-
-        resp_json = resp.json()
-
-        view_snap_count = 0
-        total_views = 0
-        for view_snapshot in resp_json:
-            view_snap_count = view_snap_count + 1
-            total_views = total_views + view_snapshot[1]
-        logging.debug("view_snap_count = %s, total_views = %s",
-                      view_snap_count, total_views)
-
-        if view_snap_count == 0:
-            logging.info("Avg views in the past week for %s is 0", user_name)
-            return 0
-        avg_views = total_views / view_snap_count
-        logging.info("Average views in the past week for %s is %s", user_name,
-                     avg_views)
-        return avg_views
-
-
-    def _get_clip_rating(self, clip_views, avg_viewers):
-        """Return a rating for the given clip."""
-        return clip_views / (avg_viewers/9 + 100)
-
-
-    def _get_good_clips(self, user_id, user_name, client_id=None,
-                        oauth_token=None):
-        """Return a list of information of 'good' clips for a user"""
-        good_clips = []
-        avg_views = self._get_avg_viewers_in_past_week(user_id, user_name)
-        if avg_views == 0:
-            logging.info("%s didn't stream since last week.  Skipping getting "
-                         "clips for %s.", user_name, user_name)
-            return good_clips
-
+    def _get_clips(self, user_id, user_name, client_id=None, oauth_token=None):
+        """Returns a list of clips for a user."""
         logging.info("Getting clips for %s", user_name)
         clip_headers = {}
         if client_id is not None:
@@ -88,6 +39,7 @@ class ClipGetter:
             'broadcaster_id': user_id,
             'started_at': self.started_at,
             'ended_at': self.ended_at,
+            'first': 100,
         }
         resp = requests.get(f'https://api.twitch.tv/helix/clips',
                             headers=clip_headers, params=clip_params)
@@ -98,23 +50,50 @@ class ClipGetter:
                           user_name, resp_json['message'])
             resp.raise_for_status()
 
-        logging.info("Got a list of clips of streamer %s", user_name)
-        all_clips = resp_json['data']
-        for clip in all_clips:
-            logging.debug("Clip %s has %s views", clip['id'],
-                          clip['view_count'])
-            clip['rating'] = self._get_clip_rating(clip['view_count'],
-                                                   avg_views)
-            logging.info("Clip %s rating %s", clip['id'], clip['rating'])
-            if clip['rating'] >= 1:
-                logging.info("Clip %s is 'good'", clip['id'])
-                good_clips.append(clip)
-            else:
-                break
-        logging.info("Found %s good clip(s) for %s", len(good_clips),
-                     user_name)
-        return good_clips
+        clips_json = resp_json['data']
+        clips = []
+        for clip_json in clips_json:
+            clip = Clip.construct_from(clip_json)
+            logging.debug("Adding clip %s", clip['id']);
+            clips.append(clip)
+        logging.info("Got %s clip(s) from streamer %s", len(clips), user_name)
+        return clips
 
+    def _get_clip_video_views(self, clip):
+        """Returns the view count of the video that a clip was created from."""
+        logging.info("Getting video views for clip %s", clip['id'])
+        if clip['video_id'] == '':
+            logging.info("Video couldn't be found for clip %s.  Default to "
+                         "900.", clip['id'])
+            return 900  # Default video views
+        video = self.client.get_videos(video_ids=[clip['video_id']])[0]
+        logging.info("Video %s for clip %s has % view(s)", clip['video_id'],
+                     clip['id'], video.view_count)
+        return video.view_count
+
+    def _get_clip_rating(self, clip_views, video_views):
+        """Return a rating given the view count of a clip and a video."""
+        return clip_views / (video_views/9 + 100)
+
+    def _get_good_clips(self, clips):
+        """Return a subset of 'good' clips from a list of clips."""
+        logging.info("Getting good clips from %s clip(s)", len(clips))
+        good_clips = []
+        for clip in clips:
+            if (self.lang is None or clip['language'] in self.lang):
+                logging.debug("Clip %s by %s has %s views", clip['id'],
+                              clip['broadcaster_name'], clip['view_count'])
+                video_views = self._get_clip_video_views(clip)
+                clip['rating'] = self._get_clip_rating(clip['view_count'],
+                                                       video_views)
+                logging.info("Clip %s rating %s", clip['id'], clip['rating'])
+                if clip['rating'] >= 1:
+                    logging.info("Clip %s is 'good'", clip['id'])
+                    good_clips.append(clip)
+            else:
+                logging.debug("Clip %s by %s doesn't isn't lang %s", clip['id'],
+                              clip['broadcaster_name'], self.lang)
+        return good_clips
 
     def get_clips(self, client_id=None, oauth_token=None):
         """Return a list of information of 'good' clips from a list of
@@ -124,13 +103,15 @@ class ClipGetter:
         https://dev.twitch.tv/docs/api/reference/#get-clips
         """
         logging.info("Getting clips")
+        self.client = TwitchHelix(client_id=client_id, oauth_token=oauth_token)
         total_clips = []
         for user in self.users_list:
-            if (self.lang is None
-                    or user['broadcaster_language'] == self.lang):
-                clips = self._get_good_clips(user['_id'], user['name'],
-                                             client_id, oauth_token)
-                if clips:
-                    total_clips.extend(clips)
+            clips = self._get_clips(user['_id'], user['name'],
+                                    client_id, oauth_token)
+            good_clips = self._get_good_clips(clips)
+            logging.info("Found %s good clip(s) for %s", len(good_clips),
+                         user['name'])
+            if good_clips:
+                total_clips.extend(good_clips)
         logging.info("Got %s clips", len(total_clips))
         return total_clips
