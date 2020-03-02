@@ -49,11 +49,14 @@ def _parse_args():
     parser.add_argument('-l', '--lang',
                         action='store',
                         nargs='+',
-                        help=("Language of clips to get, e.g. 'en' for English"
+                        help=("Languages of clips to get, e.g. 'en' for English"
                               ", 'ko' for Korean, 'es' for Spanish."))
     parser.add_argument('-L', '--log_file',
                         action='store',
                         help="Name of the log file.")
+    parser.add_argument('-d', '--debug',
+                        action='store_true',
+                        help="Show debug log messages.")
     args = parser.parse_args()
     if args.lang is not None:
         args.lang = set(args.lang)
@@ -101,7 +104,7 @@ def main():
     """Executes the Clip9 main script."""
     start_time = time.time()
     args = _parse_args()
-    level = logging.INFO
+    level = logging.DEBUG if args.debug else logging.INFO
     format = '[%(asctime)s]%(levelname)s: %(message)s'
     if args.log_file is None:
         logging.basicConfig(level=level, stream=sys.stdout, format=format)
