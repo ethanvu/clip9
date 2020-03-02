@@ -121,8 +121,9 @@ def main():
 
     token = OauthToken(client_id, client_secret)
     if not token.validate():
-        logging.error("Token isn't valid")
+        logging.error("Token for %s isn't valid", client_id)
         sys.exit(1)
+
     try:
         team_users = TeamUsers()
         team_users.get(args.team, client_id=client_id, oauth_token=token.token)
@@ -132,7 +133,7 @@ def main():
         clips_list = getter.get_clips(client_id, token.token)
         splicer = ClipSplicer(clips_list)
         splicer.splice(args.output_file, args.clips_dir)
-        logging.info("Successfully generated a video of good clips")
+        logging.info("Successfully generated a video of 'good' clips")
     except Exception as e:
         logging.error("There was an exception during execution")
         raise e
