@@ -13,7 +13,6 @@ class ClipSplicer():
     def __init__(self, clips_list):
         self.clips_list = clips_list
 
-
     def _get_clip_src_url(self, embed_url):
         """Gets the source URL of a clip given its embed URL.
 
@@ -76,7 +75,6 @@ class ClipSplicer():
         logging.info("Found video src %s", elem.attrs['src'])
         return elem.attrs['src']
 
-
     def _download_clip(self, clip, path):
         """Downloads a clip as an mp4 file.
 
@@ -98,14 +96,12 @@ class ClipSplicer():
                     f.write(chunk)
         logging.info("Downloaded %s.mp4", clip['id'])
 
-
     def _splice_clips(self, result_file_name, file_list):
         result = concatenate_videoclips(file_list)
         if result_file_name[-4:] == '.avi':
             result.write_videofile(f'{result_file_name}', codec='png')
         else:
             result.write_videofile(f'{result_file_name}')
-
 
     def splice(self, result_file_name, clips_dir='./'):
         """Splices the clips in clips_list into an mp4, ogv, webm, or

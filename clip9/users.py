@@ -6,7 +6,6 @@ class Users:
     def __init__(self):
         self.users_list = []
 
-
     def get(self, *args, client_id=None, oauth_token=None):
         """Gets a list of users.
 

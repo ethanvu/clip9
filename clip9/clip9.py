@@ -14,11 +14,9 @@ from clipsplice import ClipSplicer
 from oauthtoken import OauthToken
 from teamusers import TeamUsers
 
-
 def handle_exception(ex_type, value, traceback):
     """Captures all uncaught exception for logging."""
     logging.error("Exception", exc_info=(ex_type, value, traceback))
-
 
 def _parse_args():
     parser = ArgumentParser(description="Gets 'good' clips from a group of "
@@ -62,7 +60,6 @@ def _parse_args():
         args.lang = set(args.lang)
     return args
 
-
 def _read_credentials_cfg(cfg_file_name):
     logging.info('Loading %s', cfg_file_name)
     if not os.path.isfile(cfg_file_name):
@@ -78,7 +75,6 @@ def _read_credentials_cfg(cfg_file_name):
     if credentials is None:
         sys.exit(1)
     return credentials
-
 
 def _parse_credentials_cfg(config):
     if not config.has_section('credentials'):
@@ -96,9 +92,7 @@ def _parse_credentials_cfg(config):
         logging.error("credentials.cfg does not contain TWITCH_CLIENT_SECRET")
         return None
     logging.info("Loaded TWITCH_CLIENT_SECRET")
-
     return credentials
-
 
 def main():
     """Executes the Clip9 main script."""
@@ -141,7 +135,6 @@ def main():
         token.revoke()
         elapsed_time = time.time() - start_time
         logging.info("Execution time: %s seconds", elapsed_time)
-
 
 if __name__ == '__main__':
     main()

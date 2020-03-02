@@ -6,7 +6,6 @@ from twitch import TwitchClient
 
 from users import Users
 
-
 class TeamUsers(Users):
     """Represents a list of Twitch users in a team."""
 
