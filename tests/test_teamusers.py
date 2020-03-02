@@ -9,6 +9,7 @@ import responses
 from constants import BASE_KRAKEN_URL
 from teamusers import TeamUsers
 
+
 example_client_id = 'uo6dggojyb8d6soh92zknwmi5ej1q2'
 example_app_access_token = 'prau3ol6mg5glgek8m89ec2s9q5i3i'
 
@@ -73,6 +74,7 @@ example_team_fail_resp_invalid_client_id_and_token = {
     'message': 'client does not exist'
 }
 
+
 @responses.activate
 def test_get_valid_team_and_client_id_gets_users():
     team_name = 'staff'
@@ -87,6 +89,7 @@ def test_get_valid_team_and_client_id_gets_users():
     users_list = team_users.users_list
     assert example_users_list == users_list
 
+
 @responses.activate
 def test_get_valid_team_and_oauth_token_gets_users():
     team_name = 'staff'
@@ -100,6 +103,7 @@ def test_get_valid_team_and_oauth_token_gets_users():
     team_users.get(team_name, oauth_token=example_app_access_token)
     users_list = team_users.users_list
     assert example_users_list == users_list
+
 
 @responses.activate
 def test_get_valid_team_client_id_and_oauth_token_gets_users():
@@ -117,6 +121,7 @@ def test_get_valid_team_client_id_and_oauth_token_gets_users():
     users_list = team_users.users_list
     assert example_users_list == users_list
 
+
 @responses.activate
 def test_get_invalid_team_throws_exception():
     team_name = 'aaaaaa'
@@ -130,11 +135,13 @@ def test_get_invalid_team_throws_exception():
     with pytest.raises(requests.HTTPError):
         team_users.get(team_name, client_id=example_client_id)
 
+
 def test_get_missing_team_throws_exception():
     team_name = None
     team_users = TeamUsers()
     with pytest.raises(TypeError):
         team_users.get(team_name, client_id=example_client_id)
+
 
 @responses.activate
 def test_get_invalid_client_id_throws_exception():
@@ -148,6 +155,7 @@ def test_get_invalid_client_id_throws_exception():
     team_users = TeamUsers()
     with pytest.raises(requests.HTTPError):
         team_users.get(team_name, client_id=example_client_id)
+
 
 @responses.activate
 def test_get_invalid_client_id_valid_token_throws_exception():
@@ -165,6 +173,7 @@ def test_get_invalid_client_id_valid_token_throws_exception():
     users_list = team_users.users_list
     assert example_users_list == users_list
 
+
 @responses.activate
 def test_get_valid_client_id_invalid_token_gets_users():
     team_name = 'staff'
@@ -181,6 +190,7 @@ def test_get_valid_client_id_invalid_token_gets_users():
     users_list = team_users.users_list
     assert example_users_list == users_list
 
+
 @responses.activate
 def test_get_invalid_token_throws_exception():
     team_name = 'staff'
@@ -194,6 +204,7 @@ def test_get_invalid_token_throws_exception():
     with pytest.raises(requests.HTTPError):
         team_users.get(team_name, client_id=example_client_id)
 
+
 @responses.activate
 def test_get_invalid_client_id_and_token_throws_exception():
     team_name = 'staff'
@@ -206,6 +217,7 @@ def test_get_invalid_client_id_and_token_throws_exception():
     team_users = TeamUsers()
     with pytest.raises(requests.HTTPError):
         team_users.get(team_name)
+
 
 @responses.activate
 def test_get_missing_client_id_and_token_throws_exception():

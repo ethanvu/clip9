@@ -6,6 +6,7 @@ from twitch import TwitchClient
 
 from users import Users
 
+
 class TeamUsers(Users):
     """Represents a list of Twitch users in a team."""
 
@@ -29,5 +30,4 @@ class TeamUsers(Users):
         client = TwitchClient(client_id=client_id, oauth_token=oauth_token)
         team = client.teams.get(args[0])
         logging.info("Got %s users", len(team.users))
-        logging.debug("Users: %s", team.users)
         self.users_list = team.users

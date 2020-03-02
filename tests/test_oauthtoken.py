@@ -9,6 +9,7 @@ import responses
 from constants import BASE_OAUTH2_URL
 from oauthtoken import OauthToken
 
+
 example_client_id = 'uo6dggojyb8d6soh92zknwmi5ej1q2'
 example_client_secret = 'nyo51xcdrerl8z9m56w9w6wg'
 example_app_access_token = 'prau3ol6mg5glgek8m89ec2s9q5i3i'
@@ -59,6 +60,7 @@ example_token_revoke_fail_resp_invalid_token = {
     'message': 'Invalid token'
 }
 
+
 @pytest.fixture
 @responses.activate
 def token():
@@ -70,6 +72,7 @@ def token():
     token = OauthToken(example_client_id, example_client_secret)
     return token
 
+
 @responses.activate
 def test_token_constructor_valid_client_id_and_secret_pass(token):
     responses.add(responses.POST,
@@ -79,6 +82,7 @@ def test_token_constructor_valid_client_id_and_secret_pass(token):
                   content_type='application/json')
 
     assert example_app_access_token == token.token
+
 
 @responses.activate
 def test_token_constructor_invalid_client_id_exception_thrown():
@@ -93,6 +97,7 @@ def test_token_constructor_invalid_client_id_exception_thrown():
     with pytest.raises(requests.HTTPError):
         OauthToken('a', example_client_secret)
 
+
 @responses.activate
 def test_token_constructor_invalid_client_secret_exception_thrown():
     responses.add(responses.POST,
@@ -105,6 +110,7 @@ def test_token_constructor_invalid_client_secret_exception_thrown():
 
     with pytest.raises(requests.HTTPError):
         OauthToken(example_client_id, 'a')
+
 
 @responses.activate
 def test_token_constructor_missing_client_id_exception_thrown():
@@ -119,6 +125,7 @@ def test_token_constructor_missing_client_id_exception_thrown():
     with pytest.raises(requests.HTTPError):
         OauthToken(None, example_client_secret)
 
+
 @responses.activate
 def test_token_constructor_missing_client_secret_exception_thrown():
     responses.add(responses.POST,
@@ -132,6 +139,7 @@ def test_token_constructor_missing_client_secret_exception_thrown():
     with pytest.raises(requests.HTTPError):
         OauthToken(example_client_id, None)
 
+
 @responses.activate
 def test_validate_valid_ret_true(token):
     responses.add(responses.GET,
@@ -142,6 +150,7 @@ def test_validate_valid_ret_true(token):
 
     is_valid = token.validate()
     assert is_valid is True
+
 
 @responses.activate
 def test_validate_invalid_ret_false(token):
@@ -154,6 +163,7 @@ def test_validate_invalid_ret_false(token):
     is_valid = token.validate()
     assert is_valid is False
 
+
 @responses.activate
 def test_revoke_valid_token_pass(token):
     responses.add(responses.POST,
@@ -162,6 +172,7 @@ def test_revoke_valid_token_pass(token):
 
     token.revoke()
     assert token.token is None
+
 
 @responses.activate
 def test_revoke_missing_token_throw_exception(token):
@@ -176,6 +187,7 @@ def test_revoke_missing_token_throw_exception(token):
 
     with pytest.raises(requests.HTTPError):
         token.revoke()
+
 
 @responses.activate
 def test_revoke_invalid_token_fail(token):
