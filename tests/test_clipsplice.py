@@ -11,7 +11,6 @@ import responses
 
 from clipsplice import ClipSplicer
 
-
 example_clip_list = [
     {
         'id': 'AwkwardHelplessSalamanderSwiftRage',
@@ -110,7 +109,6 @@ class Element:
     def __init__(self, attrs):
         self.attrs = attrs
 
-
 @responses.activate
 def test__get_clip_src_url_valid_thumbnail_url_ret_src(mocker):
     expected_url = 'https://clips-media-assets2.twitch.tv/157589949.mp4'
@@ -124,7 +122,6 @@ def test__get_clip_src_url_valid_thumbnail_url_ret_src(mocker):
     splicer = ClipSplicer(example_clip_list)
     src_url = splicer._get_clip_src_url(example_clip_list[0]['embed_url'])
     assert expected_url == src_url
-
 
 @responses.activate
 def test__get_clip_src_url_valid_url_with_retry_ret_src(mocker):
@@ -145,7 +142,6 @@ def test__get_clip_src_url_valid_url_with_retry_ret_src(mocker):
     src_url = splicer._get_clip_src_url(example_clip_list[0]['embed_url'])
     assert expected_url == src_url
 
-
 @responses.activate
 def test__get_clip_src_url_elem_not_found_throws_exception(mocker):
     embed_url = 'https://clips.twitch.tv/embed?clip=a'
@@ -161,7 +157,6 @@ def test__get_clip_src_url_elem_not_found_throws_exception(mocker):
     with pytest.raises(requests.HTTPError):
         splicer._get_clip_src_url(embed_url)
 
-
 @responses.activate
 def test__get_clip_src_url_missing_src_throws_exception(mocker):
     embed_url = 'https://clips.twitch.tv/'
@@ -176,7 +171,6 @@ def test__get_clip_src_url_missing_src_throws_exception(mocker):
     with pytest.raises(requests.HTTPError):
         splicer._get_clip_src_url(embed_url)
 
-
 @responses.activate
 def test__get_clip_src_url_failed_connection_throws_exception(mocker):
     responses.add(responses.GET,
@@ -187,7 +181,6 @@ def test__get_clip_src_url_failed_connection_throws_exception(mocker):
     splicer = ClipSplicer(example_clip_list)
     with pytest.raises(requests.HTTPError):
         splicer._get_clip_src_url(example_clip_list[0]['embed_url'])
-
 
 @responses.activate
 def test__download_clip_valid_url_success(mocker):
@@ -207,7 +200,6 @@ def test__download_clip_valid_url_success(mocker):
     m.assert_called_with(f'{path}/{example_clip_list[0]["id"]}.mp4', 'wb')
     m().write.assert_called_once_with(b'a')
 
-
 @responses.activate
 def test__download_clip_invalid_url_throws_exception(mocker):
     src_url = 'https://clips-media-assets2.twitch.tv/157589949.mp4'
@@ -223,7 +215,6 @@ def test__download_clip_invalid_url_throws_exception(mocker):
     splicer = ClipSplicer(example_clip_list)
     with pytest.raises(requests.HTTPError):
         splicer._download_clip(example_clip_list[0], path)
-
 
 @responses.activate
 def test__download_clip_invalid_path_throws_exception(mocker):

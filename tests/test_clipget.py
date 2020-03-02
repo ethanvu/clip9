@@ -13,7 +13,6 @@ from twitch.resources import Video
 from constants import BASE_HELIX_URL
 from clipget import ClipGetter
 
-
 example_client_id = 'uo6dggojyb8d6soh92zknwmi5ej1q2'
 example_app_access_token = 'prau3ol6mg5glgek8m89ec2s9q5i3i'
 
@@ -136,7 +135,6 @@ example_clips_resp_invalid_client_id_and_token = {
     'message': 'Must provide a valid Client-ID or OAuth token'
 }
 
-
 @responses.activate
 def test__get_clips_valid_client_id_ret_clips():
     responses.add(responses.GET,
@@ -154,7 +152,6 @@ def test__get_clips_valid_client_id_ret_clips():
     assert len(clips) == 2
     assert clips[0]['id'] == 'RandomClip1'
     assert clips[1]['id'] == 'RandomClip2'
-
 
 @responses.activate
 def test__get_clips_valid_oauth_token_ret_clips():
@@ -174,7 +171,6 @@ def test__get_clips_valid_oauth_token_ret_clips():
     assert clips[0]['id'] == 'RandomClip1'
     assert clips[1]['id'] == 'RandomClip2'
 
-
 @responses.activate
 def test__get_clips_no_clips_ret_no_clips():
     responses.add(responses.GET,
@@ -191,7 +187,6 @@ def test__get_clips_no_clips_ret_no_clips():
                               oauth_token=example_app_access_token)
     assert len(clips) == 0
 
-
 @responses.activate
 def test__get_clips_invalid_client_id_and_token_throw_exception():
     responses.add(responses.GET,
@@ -207,7 +202,6 @@ def test__get_clips_invalid_client_id_and_token_throw_exception():
         getter._get_clips(example_users_list[0]["_id"],
                           example_users_list[0]["name"])
 
-
 def test__get_clip_video_views_clip_empty_video_id_ret_900():
     clip = Clip()
     clip.id = 'AwkwardHelplessSalamanderSwiftRage'
@@ -216,7 +210,6 @@ def test__get_clip_video_views_clip_empty_video_id_ret_900():
 
     views = getter._get_clip_video_views(clip)
     assert 900 == views
-
 
 def test__get_clip_video_views_clip_video_id_ret_views():
     clip = Clip()
@@ -231,20 +224,17 @@ def test__get_clip_video_views_clip_video_id_ret_views():
     views = getter._get_clip_video_views(clip)
     assert 10 == views
 
-
 def test__get_clip_rating_low_clip_views_high_avg_ret_gt_1():
     expected_rating = 1
     getter = ClipGetter(example_users_list)
     rating = getter._get_clip_rating(250, 1000)
     assert expected_rating < rating
 
-
 def test__get_clip_rating_low_clip_views_high_avg_ret_lt_1():
     expected_rating = 1
     getter = ClipGetter(example_users_list)
     rating = getter._get_clip_rating(150, 1000)
     assert expected_rating > rating
-
 
 def test__get_good_clips_1_good_clip_ret_clips():
     getter = ClipGetter(example_users_list)
@@ -253,7 +243,6 @@ def test__get_good_clips_1_good_clip_ret_clips():
     clips = getter._get_good_clips(example_clips_resp['data'])
     assert len(clips) == 1
     assert clips[0]['id'] == 'RandomClip1'
-
 
 def test__get_good_clips_2_good_clip_ret_clips():
     getter = ClipGetter(example_users_list)
@@ -264,7 +253,6 @@ def test__get_good_clips_2_good_clip_ret_clips():
     assert clips[0]['id'] == 'RandomClip1'
     assert clips[1]['id'] == 'RandomClip2'
 
-
 def test_get_get_good_clips_lang_en_ret_less_clips():
     getter = ClipGetter(example_users_list, lang={'en'})
     getter._get_clip_video_views = Mock(return_value=450)
@@ -273,13 +261,11 @@ def test_get_get_good_clips_lang_en_ret_less_clips():
     assert len(clips) == 1
     assert clips[0]['id'] == 'RandomClip1'
 
-
 def test__get_good_clips_no_clips_ret_no_clips():
     getter = ClipGetter(example_users_list)
 
     clips = getter._get_good_clips(example_clips_resp_no_clips['data'])
     assert len(clips) == 0
-
 
 def test_get_clips_valid_client_id_ret_clips():
     getter = ClipGetter(example_users_list)
@@ -294,7 +280,6 @@ def test_get_clips_valid_client_id_ret_clips():
     assert clips[0]['id'] == 'RandomClip1'
     assert clips[1]['id'] == 'RandomClip3'
 
-
 def test_get_clips_valid_token_ret_clips():
     getter = ClipGetter(example_users_list)
     ret_clips = [example_clips_resp['data'], example_clips_resp2['data']]
@@ -307,7 +292,6 @@ def test_get_clips_valid_token_ret_clips():
     assert len(clips) == 2
     assert clips[0]['id'] == 'RandomClip1'
     assert clips[1]['id'] == 'RandomClip3'
-
 
 def test_get_clips_no_good_clips_ret_no_clips():
     getter = ClipGetter(example_users_list)
