@@ -67,7 +67,7 @@ class ClipGetter:
                          "900.", clip['id'])
             return 900  # Default video views
         video = self.client.get_videos(video_ids=[clip['video_id']])[0]
-        logging.info("Video %s for clip %s has % view(s)", clip['video_id'],
+        logging.info("Video %s for clip %s has %s view(s)", clip['video_id'],
                      clip['id'], video.view_count)
         return video.view_count
 
