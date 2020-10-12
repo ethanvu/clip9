@@ -1,11 +1,10 @@
 ez-setup
 moviepy
+python-twitch-client
+requests
+
+# dev
 pytest
 pytest-cov
 pytest-mock
-python-twitch-client
-requests
--e git+https://github.com/ethanvu/requests-html.git@8ca7211b9c5fd69d4b8667c37d2cee8f43409438#egg=requests_html_evu
 responses
-Pillow==6.2.2
-websockets==6.0
