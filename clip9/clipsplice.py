@@ -3,9 +3,9 @@
 import logging
 
 from moviepy.editor import concatenate_videoclips, VideoFileClip
-import pyppeteer
 import requests
-from requests_html import HTMLSession
+
+from constants import BASE_GQL_URL
 
 class ClipSplicer():
     """Downloads and splices Twitch clips into a video."""
@@ -13,67 +13,43 @@ class ClipSplicer():
     def __init__(self, clips_list):
         self.clips_list = clips_list
 
-    def _get_clip_src_url(self, embed_url):
+    def _get_clip_src_url(self, clip_id):
         """Gets the source URL of a clip given its embed URL.
 
-        :param embed_url: Embed URL of the clip,
-                          e.g. https://clips.twitch.tv/
-                          embed?clip=AwkwardHelplessSalamanderSwiftRage
+        :param clip_id: ID of the clip, e.g AwkwardHelplessSalamanderSwiftRage
         :returns: Source URL of a clip.  This URL can be used to download the
                   the clip.
         :raises requests.HTTPError: When the source URL can't be found.
         """
-        logging.info("Getting clip source URL from %s", embed_url)
-        session = HTMLSession()
-        resp = session.get(embed_url)
+        logging.info("Getting clip source URL for %s", clip_id)
+        header = {"Client-Id": "kimne78kx3ncx6brgo4mv6wki5h1ko"}
+        data = [{
+            "operationName": "VideoAccessToken_Clip",
+            "variables": {"slug": clip_id},
+            "extensions": {
+                "persistedQuery": {
+                    "version": 1,
+                    "sha256Hash": ("9bfcc0177bffc730bd5a5a89005869d2773480cf1"
+                                   "738c592143b5173634b7d15")
+                }
+            }
+        }]
+        resp = requests.post(BASE_GQL_URL, headers=header, json=data)
 
         if resp.status_code >= 400:
+            logging.error("Error when getting info for clip %s", clip_id)
             resp.raise_for_status()
 
-        script = """
-            () => {
-                var controls = document.getElementsByClassName(
-                        "pl-controls-bottom")[0];
-                controls.click();
-                var settings = document.getElementsByClassName(
-                        "qa-settings-button")[0];
-                settings.click();
-                var quality = document.getElementsByClassName(
-                        "qa-quality-button")[0];
-                quality.click();
-                var qualities = document.getElementsByClassName(
-                        "pl-quality-option-button");
-                var highest_quality = qualities[qualities.length - 1];
-                highest_quality.click();
-            }
-        """
-        i = 1
-        elem = None
-        while ((i <= 3) and ((elem is None) or ('src' not in elem.attrs))):
-            logging.info("Rendering %s: try %i", embed_url, i)
-            try:
-                resp.html.render(script=script, sleep=i)
-            except pyppeteer.errors.ElementHandleError as e:
-                logging.exception("Error when executing JavaScript to find "
-                                  "video source URL on %s: %s", embed_url, e)
-                elem = None
-                i += 1
-                continue
-            elem = resp.html.xpath('/html/body/div[1]/div[1]/video',
-                                   first=True)
-            i += 1
-        session.close()
+        json = resp.json()
+        if 'errors' in json[0]:
+            raise requests.HTTPError(f"Errors when finding info for clip "
+                                     f"{clip_id}: {json[0]['errors']}")
 
-        if elem is None:
-            raise requests.HTTPError(f"Couldn't find video element after "
-                                     f"rendering {embed_url}")
-        if 'src' not in elem.attrs:
-            raise requests.HTTPError(f"Couldn't find src attribute in video "
-                                     f"element after rendering {embed_url}.")
+        clip_info = json[0]['data']['clip']
+        if clip_info is None:
+            raise requests.HTTPError(f"Couldn't find clip {clip_id}")
 
-        logging.debug("Attributes: %s", elem.attrs)
-        logging.info("Found video src %s", elem.attrs['src'])
-        return elem.attrs['src']
+        return clip_info['videoQualities'][0]['sourceURL']
 
     def _download_clip(self, clip, path):
         """Downloads a clip as an mp4 file.
@@ -83,7 +59,7 @@ class ClipSplicer():
         :raises requests.HTTPError: When there is an error when downloading.
         """
         logging.info("Downloading clip %s", clip['id'])
-        clip_src_url = self._get_clip_src_url(clip['embed_url'])
+        clip_src_url = self._get_clip_src_url(clip['id'])
         resp = requests.get(clip_src_url, stream=True)
 
         if resp.status_code >= 400:
