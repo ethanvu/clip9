@@ -9,7 +9,7 @@ imageio==2.9.0
 imageio-ffmpeg==0.4.2
 iniconfig==1.0.1
 moviepy==1.0.3
-numpy==1.19.2
+numpy==1.22.0
 packaging==20.4
 Pillow==7.2.0
 pluggy==0.13.1
