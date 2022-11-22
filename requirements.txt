@@ -11,7 +11,7 @@ iniconfig==1.0.1
 moviepy==1.0.3
 numpy==1.19.2
 packaging==20.4
-Pillow==7.2.0
+Pillow==9.3.0
 pluggy==0.13.1
 proglog==0.1.9
 py==1.9.0
